@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: ca.on.oicr.pde.workflows.Varscan2WorkflowTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.904 sec - in ca.on.oicr.pde.workflows.Varscan2WorkflowTest

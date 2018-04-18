@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testng-results skipped="0" failed="0" total="1" passed="1">
+  <reporter-output>
+  </reporter-output>
+  <suite name="Surefire suite" duration-ms="470" started-at="2018-04-18T20:15:11Z" finished-at="2018-04-18T20:15:11Z">
+    <groups>
+    </groups>
+    <test name="Surefire test" duration-ms="470" started-at="2018-04-18T20:15:11Z" finished-at="2018-04-18T20:15:11Z">
+      <class name="ca.on.oicr.pde.workflows.XenoClassifyWorkflowTest">
+        <test-method status="PASS" signature="validateRegressionTestDefinition()[pri:0, instance:ca.on.oicr.pde.workflows.XenoClassifyWorkflowTest@1f488344]" name="validateRegressionTestDefinition" duration-ms="455" started-at="2018-04-18T16:15:11Z" finished-at="2018-04-18T16:15:11Z">
+          <reporter-output>
+          </reporter-output>
+        </test-method> <!-- validateRegressionTestDefinition -->
+      </class> <!-- ca.on.oicr.pde.workflows.XenoClassifyWorkflowTest -->
+    </test> <!-- Surefire test -->
+  </suite> <!-- Surefire suite -->
+</testng-results>
