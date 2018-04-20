@@ -27,46 +27,38 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
     private String outDir;
 
     // Input Data
-    private String tumorBam;
-    private String normalBam;
-    private String outputFilenamePrefix;
+    private String fastqR1;
+    private String fastqR2;
     
-    // Params SNP
-    private Float minVarFreq;
-    private Integer minCovTumour;
-    private Integer minCovNormal;
+    // Params BWA
+    private String hostBamPrefix;
+    private String graftBamPrefix;
+    private String hostRefFasta;
+    private String graftRefFasta;
     
-    // Params CNA
-    private Integer minBaseQual;
-    private Integer minCov;
-    private Integer minMapQ;
-
+    // Params Xenoclassify
+    private Integer neitherThreshold;
+    private Integer tolerance;
+    private Integer difference;
+    private String outputPrefix;
+    private String fastqOutput;
+    private String bamOutput;
     
-
     //Tools
     private String samtools;
-    private String java;
-    private String varscan;
-//    private String bcftools;
-//    private String vcftools;
-    private String tabix;
-    private String bgzip;
+    private String xenoClassify;
 
     //Memory allocation
-    private Integer varscanMem;
+    private Integer  bwaMem;
+    private Integer xenoClassifyMem;
     private String javaMem = "-Xmx8g";
-
-
-
-    //ref Data
-    private String refFasta;
 
     private boolean manualOutput;
     private String queue;
 
     // meta-types
-    private final static String VCF_GZ_METATYPE = "application/vcf-gz";
-    private final static String TBI_METATYPE = "application/tbi";
+    private final static String FASTQ_GZ_METATYPE = "application/fastq-gz";
+    private final static String BAM_METATYPE = "application/bam";
 
     private void init() {
         try {
@@ -75,39 +67,37 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
             tmpDir = getProperty("tmp_dir");
 
             // input samples 
-            tumorBam = getProperty("input_files_tumor");
-//            normalBam = getOptionalProperty("input_files_normal", null);
+            fastqR1 = getProperty("fastq_read_1");
+            fastqR2 = getProperty("fastq_read_2");
             
-            // params
-            minVarFreq = Float.parseFloat(getProperty("minimum_variant_freq"));
-            minBaseQual = Integer.parseInt(getOptionalProperty("minimum_base_quality", "20"));
-            minMapQ = Integer.parseInt(getOptionalProperty("minimum_mapping_quality", "20"));
-            minCov = Integer.parseInt(getOptionalProperty("minimum_coverage_cutoff", "20"));
-            minCovTumour = Integer.parseInt(getProperty("minimum_coverage_cutoff_tumour"));
-            minCovNormal = Integer.parseInt(getOptionalProperty("minimum_coverage_cutoff_normal", "8"));
+            //genome references
+            hostRefFasta = getProperty("host_ref_fasta");
+            graftRefFasta = getProperty("graft_ref_fasta");
+            
+            //bam file names
+            hostBamPrefix = getProperty("host_bam_prefix");
+            graftBamPrefix = getProperty("graft_bam_prefix");
+            
+            //XenoClassify params
+            neitherThreshold = Integer.parseInt(getOptionalProperty("neither_threshold","20"));
+            tolerance = Integer.parseInt(getOptionalProperty("tolerance","5"));
+            difference = Integer.parseInt(getOptionalProperty("difference","5"));
+            outputPrefix = getOptionalProperty("output_prefix","");
+            fastqOutput = getOptionalProperty("fastq_output","");
+            bamOutput = getOptionalProperty("bam_output","");
 
-            //Ext id
-            outputFilenamePrefix = getProperty("external_name");
-
-            //samtools
+            //tools
             samtools = getProperty("samtools");
-            
-            //tabix
-            tabix = getProperty("tabix");
-            bgzip = getProperty("bgzip");
-            
-            //varscan
-            java = getProperty("java");
-            varscan = getProperty("varscan").toString();
+            xenoClassify = getProperty("xenoClassify");
 
-            // ref fasta
-            refFasta = getProperty("ref_fasta");
+            //java = getProperty("java");
 
             manualOutput = Boolean.parseBoolean(getProperty("manual_output"));
             queue = getOptionalProperty("queue", "");
 
-            varscanMem = Integer.parseInt(getProperty("varscan_mem"));
-
+            bwaMem = Integer.parseInt(getProperty("bwa_mem"));
+            xenoClassifyMem = Integer.parseInt(getProperty("xenoClassify_mem"));
+            
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
@@ -140,6 +130,72 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
         }
         return this.getFiles();
     }
+    
+//    @Override
+//    public void buildWorkflow() {
+//        //Runs the script you submit to the Job
+////        Job job = myScriptJob();
+////
+////        // You shouldn't need to modify this
+////        // If your script does not submit jobs to the cluster or 'blocks', meaning
+////        // that it pauses execution until completion, then you do not need the monitoring
+////        // step. Remove the following line and amend the output files so that they 
+////        // are defined for the job above. e.g. defineOutputFiles(job);
+////        Job monitor = monitorSgeJobs(job);
+//        String inputs = this.inputDir + "/" + " ";
+//        String output1 = this.outputDir + "/" + " ";
+//        Job parentJob = null;
+//        Job t1 = test1();
+//        t1.addParent(parentJob);
+//        
+//        Job t2 = test2(inputs);
+//        t2.addParent(t1);
+//        
+//        Job t3 = test3();
+//        t3.addParent(t1);
+//        
+//	try {
+//            defineOutputFiles(monitor);
+//	}
+//	catch (Exception e) {
+//	    e.printStackTrace();
+//	    System.exit(1);
+//	}
+//    }
+//
+//    /**
+//     * Creates a job that wraps a user-provided script. Modify this method if
+//     * necessary.
+//     *
+//     * @return the Job that describes
+////     */
+////    private Job myScriptJob() {
+//        
+////        //Set up the job
+////        Job job1 = newJob("RunScript");
+////        job1.setMaxMemory(getProperty("my_script_mem_mb"));
+//
+//        //Create the command
+////        String command = String.format("%s %s >> output", 
+////                getProperty("my_script"), getProperty("my_script_parameters"));
+////        job1.getCommand().addArgument(command);
+////	job1.setQueue(getOptionalProperty("queue", ""));
+////        return job1;
+//    }
+//    
+//    private Job test1 (String sortedBam, String finalBam) {
+//        Job test1 = new Job("test_part1");
+//        Command cmd = test1.getCommand();
+//        cmd.addArgument("bwa mem");
+//        cmd.addArgument("-t 8");
+//        cmd.addArgument("-M "+this.RefGenome);
+//        cmd.addArgument(this.fastq1 + " " this.fastq2 +" |");
+//        cmd.addArgument(this.samtools + " view -Sb - > $SWID.bam" + ";");
+//        cmd.addArgument(this.samtool+" sort -o " +sortedBam + " -n " + finalBam);
+//        test1.getMaxMemory();
+//        test1.getQueue();
+//        return test1;
+//    }
 
     @Override
     public void buildWorkflow() {
