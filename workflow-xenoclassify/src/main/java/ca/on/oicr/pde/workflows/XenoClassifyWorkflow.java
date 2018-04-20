@@ -45,11 +45,12 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
     private String bamOutput;
     
     //Tools
-    private String samtools;
+    private String bwaMem;
     private String xenoClassify;
+    private String samtools;
 
     //Memory allocation
-    private Integer  bwaMem;
+    private Integer  bwaMemMem;
     private Integer xenoClassifyMem;
     private String javaMem = "-Xmx8g";
 
@@ -83,19 +84,18 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
             tolerance = Integer.parseInt(getOptionalProperty("tolerance","5"));
             difference = Integer.parseInt(getOptionalProperty("difference","5"));
             outputPrefix = getOptionalProperty("output_prefix","");
-            fastqOutput = getOptionalProperty("fastq_output","");
-            bamOutput = getOptionalProperty("bam_output","");
 
             //tools
-            samtools = getProperty("samtools");
+            bwaMem = getProperty("bwa_mem");
             xenoClassify = getProperty("xenoClassify");
+            samtools = getProperty("samtools");
 
             //java = getProperty("java");
 
             manualOutput = Boolean.parseBoolean(getProperty("manual_output"));
             queue = getOptionalProperty("queue", "");
 
-            bwaMem = Integer.parseInt(getProperty("bwa_mem"));
+            bwaMemMem = Integer.parseInt(getProperty("bwa_mem"));
             xenoClassifyMem = Integer.parseInt(getProperty("xenoClassify_mem"));
             
         } catch (Exception e) {
@@ -118,85 +118,21 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
 
     @Override
     public Map<String, SqwFile> setupFiles() {
-        SqwFile file0 = this.createFile("tumor");
-        file0.setSourcePath(tumorBam);
-        file0.setType("application/bam");
-        file0.setIsInput(true);
-        if (normalBam != null) { // check for missing matched normals
-            SqwFile file1 = this.createFile("normal");
-            file1.setSourcePath(normalBam);
-            file1.setType("application/bam");
-            file1.setIsInput(true);
-        }
+        SqwFile file_R1 = this.createFile("fastqR1");
+        file_R1.setSourcePath(fastqR1);
+        file_R1.setType(FASTQ_GZ_METATYPE);
+        file_R1.setIsInput(true);
+        
+        SqwFile file_R2 = this.createFile("fastqR2");
+        file_R2.setSourcePath(fastqR2);
+        file_R2.setType(FASTQ_GZ_METATYPE);
+        file_R2.setIsInput(true);
+        
+        //SqwFile for fasta files?
+        
         return this.getFiles();
     }
     
-//    @Override
-//    public void buildWorkflow() {
-//        //Runs the script you submit to the Job
-////        Job job = myScriptJob();
-////
-////        // You shouldn't need to modify this
-////        // If your script does not submit jobs to the cluster or 'blocks', meaning
-////        // that it pauses execution until completion, then you do not need the monitoring
-////        // step. Remove the following line and amend the output files so that they 
-////        // are defined for the job above. e.g. defineOutputFiles(job);
-////        Job monitor = monitorSgeJobs(job);
-//        String inputs = this.inputDir + "/" + " ";
-//        String output1 = this.outputDir + "/" + " ";
-//        Job parentJob = null;
-//        Job t1 = test1();
-//        t1.addParent(parentJob);
-//        
-//        Job t2 = test2(inputs);
-//        t2.addParent(t1);
-//        
-//        Job t3 = test3();
-//        t3.addParent(t1);
-//        
-//	try {
-//            defineOutputFiles(monitor);
-//	}
-//	catch (Exception e) {
-//	    e.printStackTrace();
-//	    System.exit(1);
-//	}
-//    }
-//
-//    /**
-//     * Creates a job that wraps a user-provided script. Modify this method if
-//     * necessary.
-//     *
-//     * @return the Job that describes
-////     */
-////    private Job myScriptJob() {
-//        
-////        //Set up the job
-////        Job job1 = newJob("RunScript");
-////        job1.setMaxMemory(getProperty("my_script_mem_mb"));
-//
-//        //Create the command
-////        String command = String.format("%s %s >> output", 
-////                getProperty("my_script"), getProperty("my_script_parameters"));
-////        job1.getCommand().addArgument(command);
-////	job1.setQueue(getOptionalProperty("queue", ""));
-////        return job1;
-//    }
-//    
-//    private Job test1 (String sortedBam, String finalBam) {
-//        Job test1 = new Job("test_part1");
-//        Command cmd = test1.getCommand();
-//        cmd.addArgument("bwa mem");
-//        cmd.addArgument("-t 8");
-//        cmd.addArgument("-M "+this.RefGenome);
-//        cmd.addArgument(this.fastq1 + " " this.fastq2 +" |");
-//        cmd.addArgument(this.samtools + " view -Sb - > $SWID.bam" + ";");
-//        cmd.addArgument(this.samtool+" sort -o " +sortedBam + " -n " + finalBam);
-//        test1.getMaxMemory();
-//        test1.getQueue();
-//        return test1;
-//    }
-
     @Override
     public void buildWorkflow() {
         Job parentJob = null;
@@ -259,20 +195,30 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
         
         
     }
-
     
-    private Job generateMpileup(String inBam, String outPileup) {
-        Job ssmpileup = getWorkflow().createBashJob("generate_mpileup");
-        Command cmd = ssmpileup.getCommand();
-        cmd.addArgument(this.samtools);
-        cmd.addArgument("mpileup -B");
-        cmd.addArgument("-f " + this.refFasta);
-        cmd.addArgument(inBam);
-        cmd.addArgument(">" + outPileup);
-        ssmpileup.setMaxMemory(Integer.toString(this.varscanMem * 1024));
-        ssmpileup.setQueue(getOptionalProperty("queue", ""));
-        return ssmpileup;
-    }   
+    private Job generateBam(String ref_genome) {
+        Job ssGenerateBam = getWorkflow().createBashJob("generate_bam");
+        Command cmd = ssGenerateBam.getCommand();
+        cmd.addArgument(this.bwaMem);
+        cmd.addArgument("-t 8");
+        cmd.addArgument("-M "+ ref_genome);
+        cmd.addArgument(this.fastqR1 + " " + this.fastqR1 + " |");
+        cmd.addArgument(this.samtools + " view -Sb - > $SWID.bam" + ";");
+        ssGenerateBam.getMaxMemory();
+        ssGenerateBam.getQueue();
+        return ssGenerateBam;
+    }
+    
+    private Job sortBam(String prefix) {
+        String sortedBam = prefix + ".bam";
+        String finalBam = prefix + "_sorted.bam";
+        Job ssSortBam = getWorkflow().createBashJob("generate_bam");
+        Command cmd = ssSortBam.getCommand();
+        cmd.addArgument(this.samtools +" sort -o " + sortedBam + " -n " + finalBam);
+        ssSortBam.getMaxMemory();
+        ssSortBam.getQueue();
+        return ssSortBam;
+    }
     
     private Job runVarScanSingleSampleMode(String tumourPileupFile) {
         Job ssSNP = getWorkflow().createBashJob("varscan_germline");
