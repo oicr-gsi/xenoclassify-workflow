@@ -129,67 +129,84 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
         file_R2.setSourcePath(fastqR2);
         file_R2.setType(FASTQ_GZ_METATYPE);
         file_R2.setIsInput(true);
-        
-        //SqwFile for fasta files?
-        
+   
         return this.getFiles();
     }
     
     @Override
     public void buildWorkflow() {
-        Job parentJob = null;
-        Job generateHostBam = generateBam(this.hostRefFasta, this.hostBamPrefix);
-        Job generateGraftBam = generateBam(this.graftRefFasta, this.graftBamPrefix);
-        Job sortHost = sortBam(this.hostBamPrefix);
-        Job sortGraft = sortBam(this.graftBamPrefix);
-        Job classifyXeno = classify(this.hostBamPrefix, this.graftBamPrefix);
         
+//        String fastqR1 = getFiles().get("fastqR1").getProvisionedPath();
+//        String fastqR2 = getFiles().get("fastqR2").getProvisionedPath();
+        
+        Job parentJob = null;
+        
+        //align fastqs to human and mouse reference genome
+        String hostBam = this.dataDir + this.hostBamPrefix + ".bam";
+        String graftBam = this.dataDir + this.graftBamPrefix + ".bam";
+        Job generateHostBam = generateBam(this.hostRefFasta, hostBam);
+        Job generateGraftBam = generateBam(this.graftRefFasta, graftBam);
         generateHostBam.addParent(parentJob);
         generateGraftBam.addParent(parentJob);
         
+        String sortedHostBam = this.dataDir + this.hostBamPrefix + "_sorted.bam";
+        String sortedGraftBam = this.dataDir + this.graftBamPrefix + "_sorted.bam";
+        Job sortHost = sortBam(hostBam, sortedHostBam);
+        Job sortGraft = sortBam(graftBam, sortedGraftBam);
         sortHost.addParent(generateHostBam);
         sortGraft.addParent(generateGraftBam);
         
+        Job classifyXeno = classify(sortedHostBam, sortedGraftBam);
         classifyXeno.addParent(sortHost);
         classifyXeno.addParent(sortGraft);
-   
+        
+        //Provision out output bam created by XenoClassify
+        String xenoClassifyBam = this.dataDir + this.outputPrefix + ".bam";
+            
+        String filteredBam = this.dataDir + this.outputPrefix + "_filtered.bam";
+        Job filter = filterHost(xenoClassifyBam, filteredBam);
+        
     }
     
-    private Job generateBam(String ref_genome, String prefix) {
+    private Job generateBam(String ref_genome, String outBam) {
         Job ssGenerateBam = getWorkflow().createBashJob("generate_bam");
         Command cmd = ssGenerateBam.getCommand();
         cmd.addArgument(this.bwaMem);
         cmd.addArgument("-t 8");
         cmd.addArgument("-M "+ ref_genome);
         cmd.addArgument(this.fastqR1 + " " + this.fastqR1 + " |");
-        cmd.addArgument(this.samtools + " view -Sb - > " + prefix + ".bam " + ";");
+        cmd.addArgument(this.samtools + " view -Sb - > " + outBam + ";");
         ssGenerateBam.getMaxMemory();
         ssGenerateBam.getQueue();
         return ssGenerateBam;
     }
     
-    private Job sortBam(String prefix) {
+    private Job sortBam(String inBam, String outBam) {
         Job ssSortBam = getWorkflow().createBashJob("generate_bam");
-        String sortedBam = prefix + ".bam";
-        String finalBam = prefix + "_sorted.bam";
         Command cmd = ssSortBam.getCommand();
-        cmd.addArgument(this.samtools + " sort -o " + sortedBam + " -n " + finalBam);
+        cmd.addArgument(this.samtools + " sort -o " + outBam + " -n " + inBam);
         ssSortBam.getMaxMemory();
         ssSortBam.getQueue();
         return ssSortBam;
     }
     
-    private Job classify(String hostPrefix, String graftPrefix) {
+    private Job classify(String hostBam, String graftBam) {
         Job ssClassify = getWorkflow().createBashJob("classify");
-        String graftBam = graftPrefix + ".bam";
-        String hostBam = hostPrefix + ".bam";
         Command cmd = ssClassify.getCommand();
         cmd.addArgument(this.python + " " + this.xenoClassify + " -M ");
         cmd.addArgument(hostBam + " -H " + graftBam + " -O " + this.dataDir);
-        cmd.addArgument(" -f " + " -b " + " -p " + this.outputPrefix);
+        cmd.addArgument(" -b " + " -p " + this.outputPrefix);
         ssClassify.getMaxMemory();
         ssClassify.getQueue();
         return ssClassify;
+    }
+    
+    // job for removing mouse reads from bam files
+    private Job filterHost(String xenoClassifyBam, String filteredBam) {
+        Job ssFilter = getWorkflow().createBashJob("filter");
+        Command cmd = ssFilter.getCommand();
+        cmd.addArgument("grep -v 'CL:Z:mouse' " + xenoClassifyBam + " > " + filteredBam); 
+        return ssFilter;
     }
     
 }
