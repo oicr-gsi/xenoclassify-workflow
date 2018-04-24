@@ -162,10 +162,16 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
         
         //Provision out output bam created by XenoClassify
         String xenoClassifyBam = this.dataDir + this.outputPrefix + ".bam";
-            
+        SqwFile xenoClassifyBamFile = createOutputFile(xenoClassifyBam, BAM_METATYPE, this.manualOutput);
+        xenoClassifyBamFile.getAnnotations().put("output BAM", "xenoclassify");
+        classifyXeno.addFile(xenoClassifyBamFile);
+        
         String filteredBam = this.dataDir + this.outputPrefix + "_filtered.bam";
         Job filter = filterHost(xenoClassifyBam, filteredBam);
         
+        //Provision out filtered bam file
+        SqwFile filteredBamFile = createOutputFile(filteredBam, BAM_METATYPE, this.manualOutput);
+        filter.addFile(filteredBamFile);
     }
     
     private Job generateBam(String ref_genome, String outBam) {
