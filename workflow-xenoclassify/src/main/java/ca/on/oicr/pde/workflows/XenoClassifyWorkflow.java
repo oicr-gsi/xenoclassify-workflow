@@ -23,7 +23,7 @@ import net.sourceforge.seqware.pipeline.workflowV2.model.SqwFile;
 public class XenoClassifyWorkflow extends OicrWorkflow {
 
     //dir
-    private String dataDir, tmpDir;
+    private String dataDir;
     private String outDir;
 
     // Input Data
@@ -41,8 +41,8 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
     private Integer tolerance;
     private Integer difference;
     private String outputPrefix;
-    private String fastqOutput;
-    private String bamOutput;
+//    private String fastqOutput;
+//    private String bamOutput;
     
     //Tools
     private String bwaMem;
@@ -53,7 +53,8 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
     //Memory allocation
     private Integer  bwaMemMem;
     private Integer xenoClassifyMem;
-    private String javaMem = "-Xmx8g";
+    private Integer samtoolsMem;
+    private Integer filterMem;
 
     private boolean manualOutput;
     private String queue;
@@ -66,7 +67,6 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
         try {
             //dir
             dataDir = "data/";
-            tmpDir = getProperty("tmp_dir");
             outDir = getProperty("out_dir");
 
             // input samples 
@@ -85,20 +85,22 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
             neitherThreshold = Integer.parseInt(getOptionalProperty("neither_threshold","20"));
             tolerance = Integer.parseInt(getOptionalProperty("tolerance","5"));
             difference = Integer.parseInt(getOptionalProperty("difference","5"));
-            outputPrefix = getOptionalProperty("output_prefix","");
+            outputPrefix = getProperty("output_prefix");
 
             //tools
             bwaMem = getProperty("bwa_mem");
             xenoClassify = getProperty("xenoClassify");
             samtools = getProperty("samtools");
-
-            //java = getProperty("java");
+            python = getProperty("python");
 
             manualOutput = Boolean.parseBoolean(getProperty("manual_output"));
             queue = getOptionalProperty("queue", "");
 
-            bwaMemMem = Integer.parseInt(getProperty("bwa_mem"));
+            //memory
+            bwaMemMem = Integer.parseInt(getProperty("bwa_mem_mem"));
             xenoClassifyMem = Integer.parseInt(getProperty("xenoClassify_mem"));
+            samtoolsMem = Integer.parseInt(getProperty("samtools_mem"));
+            filterMem = Integer.parseInt(getProperty("filter_mem"));
             
         } catch (Exception e) {
             throw new RuntimeException(e);
@@ -109,12 +111,8 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
     public void setupDirectory() {
         init();
         this.addDirectory(dataDir);
-        this.addDirectory(tmpDir);
         if (!dataDir.endsWith("/")) {
             dataDir += "/";
-        }
-        if (!tmpDir.endsWith("/")) {
-            tmpDir += "/";
         }
     }
 
@@ -136,16 +134,16 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
     @Override
     public void buildWorkflow() {
         
-//        String fastqR1 = getFiles().get("fastqR1").getProvisionedPath();
-//        String fastqR2 = getFiles().get("fastqR2").getProvisionedPath();
+        String fastqR1 = getFiles().get("fastqR1").getProvisionedPath();
+        String fastqR2 = getFiles().get("fastqR2").getProvisionedPath();
         
         Job parentJob = null;
         
         //align fastqs to human and mouse reference genome
         String hostBam = this.dataDir + this.hostBamPrefix + ".bam";
         String graftBam = this.dataDir + this.graftBamPrefix + ".bam";
-        Job generateHostBam = generateBam(this.hostRefFasta, hostBam);
-        Job generateGraftBam = generateBam(this.graftRefFasta, graftBam);
+        Job generateHostBam = generateBam(this.hostRefFasta, hostBam, fastqR1, fastqR2);
+        Job generateGraftBam = generateBam(this.graftRefFasta, graftBam, fastqR1, fastqR2);
         generateHostBam.addParent(parentJob);
         generateGraftBam.addParent(parentJob);
         
@@ -161,7 +159,7 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
         classifyXeno.addParent(sortGraft);
         
         //Provision out output bam created by XenoClassify
-        String xenoClassifyBam = this.dataDir + this.outputPrefix + ".bam";
+        String xenoClassifyBam = this.dataDir + outputPrefix + "_output.bam";
         SqwFile xenoClassifyBamFile = createOutputFile(xenoClassifyBam, BAM_METATYPE, this.manualOutput);
         xenoClassifyBamFile.getAnnotations().put("output BAM", "xenoclassify");
         classifyXeno.addFile(xenoClassifyBamFile);
@@ -174,25 +172,25 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
         filter.addFile(filteredBamFile);
     }
     
-    private Job generateBam(String ref_genome, String outBam) {
+    private Job generateBam(String ref_genome, String outBam, String fastqR1, String fastqR2) {
         Job ssGenerateBam = getWorkflow().createBashJob("generate_bam");
         Command cmd = ssGenerateBam.getCommand();
         cmd.addArgument(this.bwaMem);
-        cmd.addArgument("-t 8");
-        cmd.addArgument("-M "+ ref_genome);
-        cmd.addArgument(this.fastqR1 + " " + this.fastqR1 + " |");
+        cmd.addArgument(" -t 8 ");
+        cmd.addArgument("-M "+ ref_genome + " ");
+        cmd.addArgument(fastqR1 + " " + fastqR1 + " | ");
         cmd.addArgument(this.samtools + " view -Sb - > " + outBam + ";");
-        ssGenerateBam.getMaxMemory();
-        ssGenerateBam.getQueue();
+        ssGenerateBam.setMaxMemory(Integer.toString(this.bwaMemMem*1024));
+        ssGenerateBam.setQueue(getOptionalProperty("queue", ""));
         return ssGenerateBam;
     }
     
     private Job sortBam(String inBam, String outBam) {
         Job ssSortBam = getWorkflow().createBashJob("generate_bam");
         Command cmd = ssSortBam.getCommand();
-        cmd.addArgument(this.samtools + " sort -o " + outBam + " -n " + inBam);
-        ssSortBam.getMaxMemory();
-        ssSortBam.getQueue();
+        cmd.addArgument(this.samtools + " sort -o " + outBam + " -n " + inBam + ";");
+        ssSortBam.setMaxMemory(Integer.toString(this.samtoolsMem*1024));
+        ssSortBam.setQueue(getOptionalProperty("queue", ""));
         return ssSortBam;
     }
     
@@ -201,9 +199,9 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
         Command cmd = ssClassify.getCommand();
         cmd.addArgument(this.python + " " + this.xenoClassify + " -M ");
         cmd.addArgument(hostBam + " -H " + graftBam + " -O " + this.dataDir);
-        cmd.addArgument(" -b " + " -p " + this.outputPrefix);
-        ssClassify.getMaxMemory();
-        ssClassify.getQueue();
+        cmd.addArgument(" -b " + " -p " + this.outputPrefix + ";");
+        ssClassify.setMaxMemory(Integer.toString(this.xenoClassifyMem*1024));
+        ssClassify.setQueue(getOptionalProperty("queue", ""));
         return ssClassify;
     }
     
@@ -211,7 +209,9 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
     private Job filterHost(String xenoClassifyBam, String filteredBam) {
         Job ssFilter = getWorkflow().createBashJob("filter");
         Command cmd = ssFilter.getCommand();
-        cmd.addArgument("grep -v 'CL:Z:mouse' " + xenoClassifyBam + " > " + filteredBam); 
+        cmd.addArgument("grep -v 'CL:Z:mouse' " + xenoClassifyBam + " > " + filteredBam + ";"); 
+        ssFilter.setMaxMemory(Integer.toString(this.filterMem*1024));
+        ssFilter.setQueue(getOptionalProperty("queue", ""));
         return ssFilter;
     }
     
