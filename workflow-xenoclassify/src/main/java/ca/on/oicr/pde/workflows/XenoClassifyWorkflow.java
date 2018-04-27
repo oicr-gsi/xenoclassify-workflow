@@ -77,7 +77,7 @@ public class XenoClassifyWorkflow extends OicrWorkflow {
             hostRefFasta = getProperty("host_ref_fasta");
             graftRefFasta = getProperty("graft_ref_fasta");
             
-            //bam file names
+            //the bam file names
             hostBamPrefix = getProperty("host_bam_prefix");
             graftBamPrefix = getProperty("graft_bam_prefix");
             
