@@ -1,0 +1,22 @@
+{
+  "defaults": {
+    "description": "Xenoclassify workflow test",
+    "metrics_calculate": "calculate.sh",
+    "metrics_compare": "compare.sh",
+    "output_metrics_dir": "/.mounts/labs/PDE/data/RegressionTests/Xenoclassify/workflow/development/output_expectation/"
+  },
+  "tests": [
+    {
+      "id": "PCSI_0044_DOWNSAMPLED",
+      "parameters": {
+        "wdl_inputs": {
+          "XenoclassifyWorkflow.fastqR1": "/.mounts/labs/PDE/data/testdata/genomic/fastq/PCSI_0044/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R1_001.fastq.subset.fastq.gz",
+          "XenoclassifyWorkflow.fastqR2": "/.mounts/labs/PDE/data/testdata/genomic/fastq/PCSI_0044/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R2_001.fastq.subset.fastq.gz",
+          "XenoclassifyWorkflow.outputPrefix": "Xenoclassify",
+          "XenoclassifyWorkflow.refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
+          "XenoclassifyWorkflow.refGraft": "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
+        }
+      }
+    }
+  ]
+}
