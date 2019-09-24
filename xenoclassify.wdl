@@ -1,6 +1,6 @@
 version 1.0
 
-workflow XenoclassifyWorkflow {
+workflow xenoClassify {
 input {
         File fastqR1
 	File fastqR2
