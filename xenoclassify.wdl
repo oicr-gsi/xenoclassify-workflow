@@ -4,9 +4,9 @@ workflow xenoClassify {
 input {
         File fastqR1
 	File fastqR2
-	String refHost
-	String refGraft
-        String outputPrefix
+	String? refHost  = "$MM10_BWA_INDEX_ROOT/mm10.fa"
+	String? refGraft = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
+        String? outputPrefix = "Xenoclassify"
 }
 
 call generateBam as generateHostBam { input: fastqR1=fastqR1, fastqR2=fastqR2,  refGenome=refHost, prefix="host" }
@@ -30,8 +30,8 @@ task generateBam {
 input {
 	File   fastqR1
  	File   fastqR2
-        String refGenome
-        String prefix
+        String? refGenome
+        String? prefix
         Int?   jobMemory = 20
         String? modules = "bwa/0.7.17 samtools/0.1.19 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
 }
@@ -84,7 +84,7 @@ task classify {
 input {
         File hostBam
         File graftBam
-        String outPrefix
+        String? outPrefix
 	String? modules = "xenoclassify/1.0"
 	Int? jobMemory = 10
         Int? neitherThreshold = 20
