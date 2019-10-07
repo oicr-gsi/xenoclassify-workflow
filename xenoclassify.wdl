@@ -3,11 +3,13 @@ version 1.0
 workflow xenoClassify {
 input {
         File fastqR1
-	File fastqR2
+	File? fastqR2
 	String? refHost  = "$MM10_BWA_INDEX_ROOT/mm10.fa"
 	String? refGraft = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
-        String? outputPrefix = "Xenoclassify"
+        String? outputFileNamePrefix = ""
 }
+
+String? outputPrefix = if outputFileNamePrefix=="" then basename(fastqR1, '.fastq.gz') else outputFileNamePrefix
 
 call generateBam as generateHostBam { input: fastqR1=fastqR1, fastqR2=fastqR2,  refGenome=refHost, prefix="host" }
 call generateBam as generateGraftBam { input: fastqR1=fastqR1, fastqR2=fastqR2, refGenome=refGraft, prefix="graft" }
@@ -21,6 +23,13 @@ call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, filteredBam
 output {
   File filteredResults = filterHost.outputBam
 }
+
+meta {
+    author: "Peter Ruzanov"
+    email: "peter.ruzanov@oicr.on.ca"
+    description: "Xenoclassify 1.0"
+}
+
 }
 
 # ================================
@@ -28,15 +37,25 @@ output {
 # ================================
 task generateBam {
 input {
-	File   fastqR1
- 	File   fastqR2
+	File  fastqR1
+ 	File? fastqR2
         String? refGenome
         String? prefix
-        Int?   jobMemory = 20
+        Int? jobMemory = 20
         String? modules = "bwa/0.7.17 samtools/0.1.19 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
 }
 
-command <<<
+parameter_meta {
+ fastqR1: "File with reads for mate 1 or fastq file for single-read data"
+ fastqR2: "File with reads for mate 2, is available"
+ refGenome: "path to fasta file for genome"
+ prefix: ""
+ jobMemory: "Memory allocated to this job"
+ modules: "Names and versions of modules needed for alignment"
+}
+
+command 
+<<<
  OUTBAM=$(echo ~{basename(fastqR1)} | sed s/_R.*/_~{prefix}.bam/)
  bwa mem -t 8 -M ~{refGenome} ~{fastqR1} ~{fastqR2} | samtools view -Sb - > $OUTBAM
  echo $OUTBAM
@@ -59,13 +78,19 @@ output {
 task sortBam {
 input {
 	File inBam
-	Int? jobMemory = 10
+	Int? jobMemory  = 10
         String? modules = "samtools/0.1.19"
 }
 
 command <<<
  samtools sort -n ~{inBam} ~{basename(inBam, '.bam')}_sorted
 >>>
+
+parameter_meta {
+ inBam: "Input .bam file"
+ jobMemory: "Memory allocated to sort task"
+ modules: "Names and versions of modules needed for sorting"
+}
 
 runtime {
   memory:  "~{jobMemory} GB"
@@ -97,6 +122,17 @@ command <<<
                                                              -n ~{neitherThreshold} -t ~{tolerance} -d ~{difference}
 >>>
 
+parameter_meta {
+ hostBam:  "Input host .bam file"
+ graftBam: "Input graft .bam file"
+ outPrefix: "Output prefix"
+ neitherThreshold: "Threshold for score below which the reads are classified as 'neither'"
+ tolerance: "Tolerance around the mean of alignment scores for a set of reads classified as 'both'"
+ difference: "Difference between the sum of host and graft alignment scores for a set of reads classified as 'both'"
+ jobMemory: "Memory allocated to classify task"
+ modules: "Names and versions of modules needed for classification"
+}
+
 runtime {
   memory:  "~{jobMemory} GB"
   modules: "~{modules}"
@@ -117,6 +153,13 @@ input {
         String? modules = "samtools/0.1.19"
         Int? jobMemory = 5
 
+}
+
+parameter_meta {
+ xenoClassifyBam: "Classified .bam file"
+ filteredBam: "Name of the filtered file"
+ modules: "Names and versions of modules needed for filtering"
+ jobMemory: "Memory allocated to filtering task"
 }
 
 command <<<
