@@ -49,7 +49,7 @@ parameter_meta {
  fastqR1: "File with reads for mate 1 or fastq file for single-read data"
  fastqR2: "File with reads for mate 2, is available"
  refGenome: "path to fasta file for genome"
- prefix: ""
+ prefix: "string which normally should be either host or graft"
  jobMemory: "Memory allocated to this job"
  modules: "Names and versions of modules needed for alignment"
 }
