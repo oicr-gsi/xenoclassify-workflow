@@ -3,7 +3,7 @@ version 1.0
 workflow xenoClassify {
 input {
         File fastqR1
-	File? fastqR2
+	File fastqR2
 	String? refHost  = "$MM10_BWA_INDEX_ROOT/mm10.fa"
 	String? refGraft = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
         String? outputFileNamePrefix = ""
@@ -37,8 +37,8 @@ meta {
 # ================================
 task generateBam {
 input {
-	File  fastqR1
- 	File? fastqR2
+	File fastqR1
+ 	File fastqR2
         String? refGenome
         String? prefix
         Int? jobMemory = 20
