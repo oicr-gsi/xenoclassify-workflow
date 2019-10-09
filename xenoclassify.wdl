@@ -16,8 +16,8 @@ call generateBam as generateGraftBam { input: fastqR1=fastqR1, fastqR2=fastqR2, 
 call sortBam as sortHostBam { input: inBam=generateHostBam.outputBam }
 call sortBam as sortGraftBam { input: inBam=generateGraftBam.outputBam }
 
-call classify { input: hostBam = sortHostBam.sortedBam, graftBam = sortGraftBam.sortedBam, outPrefix = outputPrefix }
-call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, filteredBam = "~{outputPrefix}_filtered.bam" }
+call classify { input: hostBam = sortHostBam.sortedBam, graftBam = sortGraftBam.sortedBam, outputPrefix = outputPrefix }
+call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, outputPrefix = outputPrefix }
 
 
 output {
@@ -42,6 +42,7 @@ input {
         String? refGenome
         String? prefix
         Int? jobMemory = 20
+        Int? threads = 8
         String? modules = "bwa/0.7.17 samtools/0.1.19 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
 }
 
@@ -57,12 +58,13 @@ parameter_meta {
 command 
 <<<
  OUTBAM=$(echo ~{basename(fastqR1)} | sed s/_R.*/_~{prefix}.bam/)
- bwa mem -t 8 -M ~{refGenome} ~{fastqR1} ~{fastqR2} | samtools view -Sb - > $OUTBAM
+ bwa mem -t ~{threads} -M ~{refGenome} ~{fastqR1} ~{fastqR2} | samtools view -Sb - > $OUTBAM
  echo $OUTBAM
 >>>
 
 runtime {
   memory:  "~{jobMemory} GB"
+  cpu: "~{threads}"
   modules: "~{modules}"
 }
 
@@ -109,7 +111,7 @@ task classify {
 input {
         File hostBam
         File graftBam
-        String? outPrefix
+        String? outputPrefix
 	String? modules = "xenoclassify/1.0"
 	Int? jobMemory = 10
         Int? neitherThreshold = 20
@@ -118,14 +120,14 @@ input {
 }
 
 command <<<
- python3 $XENOCLASSIFY_ROOT/bin/xenoclassify/xenoclassify.py -H ~{hostBam} -G ~{graftBam} -O . -b -p ~{outPrefix} \
+ python3 $XENOCLASSIFY_ROOT/bin/xenoclassify/xenoclassify.py -H ~{hostBam} -G ~{graftBam} -O . -b -p ~{outputPrefix} \
                                                              -n ~{neitherThreshold} -t ~{tolerance} -d ~{difference}
 >>>
 
 parameter_meta {
  hostBam:  "Input host .bam file"
  graftBam: "Input graft .bam file"
- outPrefix: "Output prefix"
+ outputPrefix: "Output prefix"
  neitherThreshold: "Threshold for score below which the reads are classified as 'neither'"
  tolerance: "Tolerance around the mean of alignment scores for a set of reads classified as 'both'"
  difference: "Difference between the sum of host and graft alignment scores for a set of reads classified as 'both'"
@@ -139,7 +141,7 @@ runtime {
 }
 
 output {
-  File xenoClassifyBam  = "~{outPrefix}_output.bam"
+  File xenoClassifyBam  = "~{outputPrefix}_output.bam"
 }
 }
 
@@ -149,7 +151,7 @@ output {
 task filterHost {
 input {
         File xenoClassifyBam
-        String filteredBam
+        String? outputPrefix = "OUTPUT"
         String? modules = "samtools/0.1.19"
         Int? jobMemory = 5
 
@@ -157,13 +159,13 @@ input {
 
 parameter_meta {
  xenoClassifyBam: "Classified .bam file"
- filteredBam: "Name of the filtered file"
+ outputPrefix: "Prefix for making filtered bam name"
  modules: "Names and versions of modules needed for filtering"
  jobMemory: "Memory allocated to filtering task"
 }
 
 command <<<
-  samtools view -h ~{xenoClassifyBam} | grep -v 'CL:Z:mouse' | samtools view -Sh - -b > ~{filteredBam}
+  samtools view -h ~{xenoClassifyBam} | grep -v 'CL:Z:mouse' | samtools view -Sh - -b > ~{outputPrefix}_filtered.bam
 >>>
 
 runtime {
@@ -172,7 +174,7 @@ runtime {
 }
 
 output {
-  File outputBam = "${filteredBam}"
+  File outputBam = "${outputPrefix}_filtered.bam"
 }
 
 }
