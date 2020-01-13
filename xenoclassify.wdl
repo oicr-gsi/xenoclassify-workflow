@@ -44,7 +44,7 @@ input {
         Int? jobMemory = 20
         Int? threads = 8
         String? modules = "bwa/0.7.17 samtools/0.1.19 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
-        Int timeout = 48
+        Int timeout = 72
 }
 
 parameter_meta {
@@ -84,7 +84,7 @@ input {
 	File inBam
 	Int? jobMemory  = 10
         String? modules = "samtools/0.1.19"
-        Int timeout = 48
+        Int timeout = 72
 }
 
 command <<<
@@ -121,7 +121,7 @@ input {
         Int? neitherThreshold = 20
         Int? tolerance = 5
         Int? difference = 5
-        Int timeout = 48
+        Int timeout = 72
 }
 
 command <<<
@@ -160,7 +160,7 @@ input {
         String? outputPrefix = "OUTPUT"
         String? modules = "samtools/0.1.19"
         Int? jobMemory = 5
-        Int timeout = 48
+        Int timeout = 72
 }
 
 parameter_meta {
