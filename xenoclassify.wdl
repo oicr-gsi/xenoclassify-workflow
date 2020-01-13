@@ -3,7 +3,7 @@ version 1.0
 workflow xenoClassify {
 input {
         File fastqR1
-	File fastqR2
+	File? fastqR2
 	String? refHost  = "$MM10_BWA_INDEX_ROOT/mm10.fa"
 	String? refGraft = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
         String? outputFileNamePrefix = ""
@@ -37,13 +37,14 @@ meta {
 # ================================
 task generateBam {
 input {
-	File fastqR1
- 	File fastqR2
+	File  fastqR1
+ 	File? fastqR2
         String? refGenome
         String? prefix
         Int? jobMemory = 20
         Int? threads = 8
         String? modules = "bwa/0.7.17 samtools/0.1.19 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
+        Int timeout = 48
 }
 
 parameter_meta {
@@ -65,6 +66,7 @@ command
 runtime {
   memory:  "~{jobMemory} GB"
   cpu: "~{threads}"
+  timeout: "~{timeout}"
   modules: "~{modules}"
 }
 
@@ -82,6 +84,7 @@ input {
 	File inBam
 	Int? jobMemory  = 10
         String? modules = "samtools/0.1.19"
+        Int timeout = 48
 }
 
 command <<<
@@ -97,6 +100,7 @@ parameter_meta {
 runtime {
   memory:  "~{jobMemory} GB"
   modules: "~{modules}"
+  timeout: "~{timeout}"
 }
 
 output {
@@ -117,6 +121,7 @@ input {
         Int? neitherThreshold = 20
         Int? tolerance = 5
         Int? difference = 5
+        Int timeout = 48
 }
 
 command <<<
@@ -138,6 +143,7 @@ parameter_meta {
 runtime {
   memory:  "~{jobMemory} GB"
   modules: "~{modules}"
+  timeout: "~{timeout}"
 }
 
 output {
@@ -154,7 +160,7 @@ input {
         String? outputPrefix = "OUTPUT"
         String? modules = "samtools/0.1.19"
         Int? jobMemory = 5
-
+        Int timeout = 48
 }
 
 parameter_meta {
@@ -171,6 +177,7 @@ command <<<
 runtime {
   memory:  "~{jobMemory} GB"
   modules: "~{modules}"
+  timeout: "~{timeout}"
 }
 
 output {
