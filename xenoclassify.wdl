@@ -1,20 +1,40 @@
 version 1.0
 
+# imports workflows for the top portion of WGSPipeline
+import "external_workflows/bwaMem.wdl" as bwaMem
+
 workflow xenoClassify {
 input {
         File fastqR1
 	File? fastqR2
-	String? refHost  = "$MM10_BWA_INDEX_ROOT/mm10.fa"
-	String? refGraft = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
-        String? outputFileNamePrefix = ""
+	String refHost  = "$MM10_BWA_INDEX_ROOT/mm10.fa"
+	String refGraft = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
+        String bwaMemModules = "bwa/0.7.17 samtools/0.1.19 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
+        String outputFileNamePrefix = ""
 }
 
-String? outputPrefix = if outputFileNamePrefix=="" then basename(fastqR1, '.fastq.gz') else outputFileNamePrefix
+String outputPrefix = if outputFileNamePrefix=="" then basename(fastqR1, '.fastq.gz') else outputFileNamePrefix
 
-call generateBam as generateHostBam { input: fastqR1=fastqR1, fastqR2=fastqR2,  refGenome=refHost, prefix="host" }
-call generateBam as generateGraftBam { input: fastqR1=fastqR1, fastqR2=fastqR2, refGenome=refGraft, prefix="graft" }
-call sortBam as sortHostBam { input: inBam=generateHostBam.outputBam }
-call sortBam as sortGraftBam { input: inBam=generateGraftBam.outputBam }
+call bwaMem.bwaMem as generateHostBam {
+  input:
+    fastqR1 = fastqR1, 
+    fastqR2 = fastqR2, 
+    runBwaMemRef = refHost, 
+    runBwaMemModules = bwaMemModules,
+    outputFileNamePrefix = "host"
+}
+
+call bwaMem.bwaMem as generateGraftBam {
+  input:
+    fastqR1 = fastqR1,
+    fastqR2 = fastqR2,
+    runBwaMemRef = refGraft,
+    runBwaMemModules = bwaMemModules,
+    outputFileNamePrefix = "graft"
+}
+
+call sortBam as sortHostBam { input: inBam = generateHostBam.bwaMemBam }
+call sortBam as sortGraftBam { input: inBam = generateGraftBam.bwaMemBam }
 
 call classify { input: hostBam = sortHostBam.sortedBam, graftBam = sortGraftBam.sortedBam, outputPrefix = outputPrefix }
 call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, outputPrefix = outputPrefix }
@@ -22,73 +42,59 @@ call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, outputPrefi
 
 output {
   File filteredResults = filterHost.outputBam
-}
-
-meta {
-    author: "Peter Ruzanov"
-    email: "peter.ruzanov@oicr.on.ca"
-    description: "Xenoclassify 1.0"
-}
-
-}
-
-# ================================
-#  TASK 1 of 4: generate bam
-# ================================
-task generateBam {
-input {
-	File  fastqR1
- 	File? fastqR2
-        String? refGenome
-        String? prefix
-        Int? jobMemory = 20
-        Int? threads = 8
-        String? modules = "bwa/0.7.17 samtools/0.1.19 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
-        Int timeout = 72
+  File jsonReport = classify.jsonReport
 }
 
 parameter_meta {
- fastqR1: "File with reads for mate 1 or fastq file for single-read data"
- fastqR2: "File with reads for mate 2, is available"
- refGenome: "path to fasta file for genome"
- prefix: "string which normally should be either host or graft"
- jobMemory: "Memory allocated to this job"
- modules: "Names and versions of modules needed for alignment"
+  fastqR1: "fastq file for read 1"
+  fastqR2: "fastq file for read 2"
+  refHost: "The reference Host genome to align the sample with by BWA"
+  refGraft: "The reference Graft genome to align the sample with by BWA"
+  outputFileNamePrefix: "Output file name prefix"
 }
 
-command 
-<<<
- OUTBAM=$(echo ~{basename(fastqR1)} | sed s/_R.*/_~{prefix}.bam/)
- bwa mem -t ~{threads} -M ~{refGenome} ~{fastqR1} ~{fastqR2} | samtools view -Sb - > $OUTBAM
- echo $OUTBAM
->>>
-
-runtime {
-  memory:  "~{jobMemory} GB"
-  cpu: "~{threads}"
-  timeout: "~{timeout}"
-  modules: "~{modules}"
+ 
+meta {
+  author: "Peter Ruzanov"
+  email: "peter.ruzanov@oicr.on.ca"
+  description: "Xenoclassify 1.0"
+  dependencies: [
+    {
+      name: "bwa/0.7.12",
+      url: "https://github.com/lh3/bwa/archive/0.7.12.tar.gz"
+    },
+    {
+      name: "samtools/0.1.19",
+      url: "https://github.com/samtools/samtools/archive/0.1.19.tar.gz"
+    },
+    {
+      name: "xenoclassify/1.0",
+      url: "https://github.com/oicr-gsi/xenoclassify/archive/1.1.tar.gz"
+    }
+  ]
+  output_meta: {
+    filteredResults: "bam file without host (most commonly mouse) reads",
+    jsonReport: "a simple stats file with counts for differently tagged reads" 
+  }
 }
 
-output {
-  File outputBam = read_string(stdout())
 }
 
-}
 
-# ================================
-#  TASK 2 of 4: sort bam
-# ================================/oicr/data/genomes/homo_sapiens_mc/UCSC/hg19_random/Genomic/bwa/0.7.12/hg19_random.fa
+# =============================================
+# run BWAmem as a subworkflow, and then
+# TASK 1 of 3: sort bam
+# =============================================
 task sortBam {
 input {
 	File inBam
-	Int? jobMemory  = 10
-        String? modules = "samtools/0.1.19"
+	Int jobMemory  = 10
+        String modules = "samtools/0.1.19"
         Int timeout = 72
 }
 
 command <<<
- samtools sort -n ~{inBam} ~{basename(inBam, '.bam')}_sorted
+ samtools sort -n ~{inBam} -o ~{basename(inBam, '.bam')}_sorted.bam
 >>>
 
 parameter_meta {
@@ -109,24 +115,47 @@ output {
 }
 
 # ===================================
-#  TASK 3 of 4: run xenoclassify bam
+#  TASK 2 of 3: run xenoclassify bam
 # ===================================
 task classify {
 input {
         File hostBam
         File graftBam
-        String? outputPrefix
-	String? modules = "xenoclassify/1.0"
-	Int? jobMemory = 10
-        Int? neitherThreshold = 20
-        Int? tolerance = 5
-        Int? difference = 5
+        String outputPrefix
+	String modules = "xenoclassify/1.0"
+        Array[String] filterTags = ["host"]
+	Int jobMemory = 10
+        Int neitherThreshold = 20
+        Int tolerance = 5
+        Int difference = 5
         Int timeout = 72
 }
 
 command <<<
+ set -euo pipefail
  python3 $XENOCLASSIFY_ROOT/bin/xenoclassify/xenoclassify.py -H ~{hostBam} -G ~{graftBam} -O . -b -p ~{outputPrefix} \
                                                              -n ~{neitherThreshold} -t ~{tolerance} -d ~{difference}
+ python3<<CODE
+ import json
+ import os
+ import re
+ json_name = "~{outputPrefix}_tagReport.json"
+ jsonDict = {}
+
+ command = "samtools view ~{outputPrefix}_output.bam | awk \'{print \$NF}\' | sort | uniq -c"
+ counts = os.popen(command).read().splitlines() 
+
+ for line in counts:
+   if line.find('CL:Z:') == 0:
+         continue
+   line = line.rstrip()
+   line = re.sub('CL:Z:', '', line)
+   tmp = line.split()
+   jsonDict[tmp[1]] = tmp[0]
+
+ with open(json_name, 'w') as json_file:
+   json.dump(jsonDict, json_file)
+ CODE
 >>>
 
 parameter_meta {
@@ -148,18 +177,20 @@ runtime {
 
 output {
   File xenoClassifyBam  = "~{outputPrefix}_output.bam"
+  File jsonReport = "~{outputPrefix}_tagReport.json"
 }
 }
 
 # ================================
-#  TASK 4 of 4: filter bam
+#  TASK 3 of 3: filter bam
 # ================================
 task filterHost {
 input {
         File xenoClassifyBam
-        String? outputPrefix = "OUTPUT"
-        String? modules = "samtools/0.1.19"
-        Int? jobMemory = 5
+        String outputPrefix = "OUTPUT"
+        String modules = "samtools/0.1.19"
+        Array[String] filterTags = ["host"]
+        Int jobMemory = 5
         Int timeout = 72
 }
 
@@ -167,11 +198,23 @@ parameter_meta {
  xenoClassifyBam: "Classified .bam file"
  outputPrefix: "Prefix for making filtered bam name"
  modules: "Names and versions of modules needed for filtering"
+ filterTags: "Filter reads with these tags"
  jobMemory: "Memory allocated to filtering task"
 }
 
 command <<<
-  samtools view -h ~{xenoClassifyBam} | grep -v 'CL:Z:mouse' | samtools view -Sh - -b > ~{outputPrefix}_filtered.bam
+  python3<<CODE
+  import os
+  inputTags =  "~{sep=' ' filterTags}"
+  tags = inputTags.split()
+  
+  command = "samtools view -h ~{xenoClassifyBam}"
+  for t in tags:
+    command = command + " | grep -v \'CL:Z:" + t + "\'"
+  
+  command = command + " | samtools view -Sh - -b > ~{outputPrefix}_filtered.bam"
+  os.system(command)
+  CODE
 >>>
 
 runtime {
