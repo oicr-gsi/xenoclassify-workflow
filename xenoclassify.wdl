@@ -1,7 +1,7 @@
 version 1.0
 
 # imports workflows for the top portion of WGSPipeline
-import "external_workflows/bwaMem.wdl" as bwaMem
+import "imports/bwaMem.wdl" as bwaMem
 
 workflow xenoClassify {
 input {
@@ -50,6 +50,7 @@ parameter_meta {
   fastqR2: "fastq file for read 2"
   refHost: "The reference Host genome to align the sample with by BWA"
   refGraft: "The reference Graft genome to align the sample with by BWA"
+  bwaMemModules: "modules for bwaMem sub-workflow"
   outputFileNamePrefix: "Output file name prefix"
 }
 
@@ -101,6 +102,7 @@ parameter_meta {
  inBam: "Input .bam file"
  jobMemory: "Memory allocated to sort task"
  modules: "Names and versions of modules needed for sorting"
+ timeout: "Timeout for this task in hours"
 }
 
 runtime {
@@ -164,6 +166,7 @@ parameter_meta {
  neitherThreshold: "Threshold for score below which the reads are classified as 'neither'"
  tolerance: "Tolerance around the mean of alignment scores for a set of reads classified as 'both'"
  difference: "Difference between the sum of host and graft alignment scores for a set of reads classified as 'both'"
+ timeout: "Timeout for this task in hours"
  jobMemory: "Memory allocated to classify task"
  modules: "Names and versions of modules needed for classification"
 }
@@ -199,6 +202,7 @@ parameter_meta {
  modules: "Names and versions of modules needed for filtering"
  filterTags: "Filter reads with these tags"
  jobMemory: "Memory allocated to filtering task"
+ timeout: "Timeout for this task in hours"
 }
 
 command <<<
