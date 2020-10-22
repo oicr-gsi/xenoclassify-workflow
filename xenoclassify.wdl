@@ -123,7 +123,6 @@ input {
         File graftBam
         String outputPrefix
 	String modules = "xenoclassify/1.0"
-        Array[String] filterTags = ["host"]
 	Int jobMemory = 10
         Int neitherThreshold = 20
         Int tolerance = 5
