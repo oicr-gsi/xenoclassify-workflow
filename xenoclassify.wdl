@@ -9,7 +9,7 @@ input {
 	File? fastqR2
 	String refHost  = "$MM10_BWA_INDEX_ROOT/mm10.fa"
 	String refGraft = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
-        String bwaMemModules = "bwa/0.7.17 samtools/0.1.19 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
+        String bwaMemModules = "bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
         String outputFileNamePrefix = ""
 }
 
@@ -65,8 +65,8 @@ meta {
       url: "https://github.com/lh3/bwa/archive/0.7.12.tar.gz"
     },
     {
-      name: "samtools/0.1.19",
-      url: "https://github.com/samtools/samtools/archive/0.1.19.tar.gz"
+      name: "samtools/1.9",
+      url: "https://github.com/samtools/samtools/archive/1.9.tar.gz"
     },
     {
       name: "xenoclassify/1.0",
@@ -190,7 +190,7 @@ task filterHost {
 input {
         File xenoClassifyBam
         String outputPrefix = "OUTPUT"
-        String modules = "samtools/0.1.19"
+        String modules = "samtools/1.9"
         Array[String] filterTags = ["host"]
         Int jobMemory = 5
         Int timeout = 72
