@@ -90,7 +90,7 @@ task sortBam {
 input {
 	File inBam
 	Int jobMemory  = 10
-        String modules = "samtools/0.1.19"
+        String modules = "samtools/1.9"
         Int timeout = 72
 }
 
