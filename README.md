@@ -67,6 +67,7 @@ Only one parameter is required, fastqR1. Normally this workflow would run with t
 Output | Type | Description
 ---|---|---
 `filteredResults`|File|bam with filtered results (no host reads)
+`filteredResultsIndex`|File|index for file with filtered results
 `jsonReport`|File|json file with simple stats showing numbers for different classification tags
 
 ## Niassa + Cromwell

@@ -390,7 +390,6 @@ task runBwaMem {
     String tmpDir = "tmp/"
 
     command <<<
-        module load ~{modules} 2>/dev/null
         set -euo pipefail
         mkdir -p ~{tmpDir}
         bwa mem -M \

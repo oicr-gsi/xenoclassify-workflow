@@ -42,6 +42,7 @@ call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, outputPrefi
 
 output {
   File filteredResults = filterHost.outputBam
+  File filteredResultsIndex = filterHost.outputBai
   File jsonReport = classify.jsonReport
 }
 
@@ -75,6 +76,7 @@ meta {
   ]
   output_meta: {
     filteredResults: "bam file without host (most commonly mouse) reads",
+    filteredResults: "index file for file without host reads",
     jsonReport: "a simple stats file with counts for differently tagged reads" 
   }
 }
@@ -124,7 +126,7 @@ input {
         File hostBam
         File graftBam
         String outputPrefix
-	String modules = "xenoclassify/1.0"
+	String modules = "samtools/1.9 xenoclassify/1.0"
 	Int jobMemory = 10
         Int neitherThreshold = 20
         Int tolerance = 5
@@ -166,8 +168,8 @@ parameter_meta {
  neitherThreshold: "Threshold for score below which the reads are classified as 'neither'"
  tolerance: "Tolerance around the mean of alignment scores for a set of reads classified as 'both'"
  difference: "Difference between the sum of host and graft alignment scores for a set of reads classified as 'both'"
- timeout: "Timeout for this task in hours"
  jobMemory: "Memory allocated to classify task"
+ timeout: "Timeout for this task in hours"
  modules: "Names and versions of modules needed for classification"
 }
 
@@ -191,6 +193,7 @@ input {
         File xenoClassifyBam
         String outputPrefix = "OUTPUT"
         String modules = "samtools/1.9"
+        String tmpDir = "tmp/"
         Array[String] filterTags = ["host"]
         Int jobMemory = 5
         Int timeout = 72
@@ -206,6 +209,8 @@ parameter_meta {
 }
 
 command <<<
+  set -euo pipefail
+  mkdir ~{tmpDir}
   python3<<CODE
   import os
   inputTags =  "~{sep=' ' filterTags}"
@@ -215,9 +220,10 @@ command <<<
   for t in tags:
     command = command + " | grep -v \'CL:Z:" + t + "\'"
   
-  command = command + " | samtools view -Sh - -b > ~{outputPrefix}_filtered.bam"
+  command = command + " | samtools sort -O bam -T ~{tmpDir} -o ~{outputPrefix}_filtered.bam -"
   os.system(command)
   CODE
+  samtools index ~{outputPrefix}_filtered.bam ~{outputPrefix}_filtered.bai
 >>>
 
 runtime {
@@ -228,6 +234,7 @@ runtime {
 
 output {
   File outputBam = "${outputPrefix}_filtered.bam"
+  File outputBai = "${outputPrefix}_filtered.bai"
 }
 
 }
