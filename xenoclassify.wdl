@@ -9,6 +9,7 @@ input {
 	File? fastqR2
 	String refHost  = "$MM10_BWA_INDEX_ROOT/mm10.fa"
 	String refGraft = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
+        String rG = "'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'"
         String bwaMemModules = "bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
         String outputFileNamePrefix = ""
 }
@@ -19,8 +20,9 @@ call bwaMem.bwaMem as generateHostBam {
   input:
     fastqR1 = fastqR1, 
     fastqR2 = fastqR2, 
-    runBwaMemRef = refHost, 
-    runBwaMemModules = bwaMemModules,
+    runBwaMem_bwaRef = refHost, 
+    runBwaMem_modules = bwaMemModules,
+    readGroups = rG,
     outputFileNamePrefix = "host"
 }
 
@@ -28,8 +30,9 @@ call bwaMem.bwaMem as generateGraftBam {
   input:
     fastqR1 = fastqR1,
     fastqR2 = fastqR2,
-    runBwaMemRef = refGraft,
-    runBwaMemModules = bwaMemModules,
+    runBwaMem_bwaRef = refGraft,
+    runBwaMem_modules = bwaMemModules,
+    readGroups = rG,
     outputFileNamePrefix = "graft"
 }
 
@@ -51,6 +54,7 @@ parameter_meta {
   fastqR2: "fastq file for read 2"
   refHost: "The reference Host genome to align the sample with by BWA"
   refGraft: "The reference Graft genome to align the sample with by BWA"
+  rG: "Read group string"
   bwaMemModules: "modules for bwaMem sub-workflow"
   outputFileNamePrefix: "Output file name prefix"
 }
@@ -193,7 +197,7 @@ input {
         File xenoClassifyBam
         String outputPrefix = "OUTPUT"
         String modules = "samtools/1.9"
-        String tmpDir = "tmp/"
+        String? tmpDir
         Array[String] filterTags = ["host"]
         Int jobMemory = 5
         Int timeout = 72
@@ -201,6 +205,7 @@ input {
 
 parameter_meta {
  xenoClassifyBam: "Classified .bam file"
+ tmpDir: "Optionally supply tmpDir for writing chunk bam files for sorting"
  outputPrefix: "Prefix for making filtered bam name"
  modules: "Names and versions of modules needed for filtering"
  filterTags: "Filter reads with these tags"
@@ -210,7 +215,6 @@ parameter_meta {
 
 command <<<
   set -euo pipefail
-  mkdir ~{tmpDir}
   python3<<CODE
   import os
   inputTags =  "~{sep=' ' filterTags}"
@@ -220,7 +224,7 @@ command <<<
   for t in tags:
     command = command + " | grep -v \'CL:Z:" + t + "\'"
   
-  command = command + " | samtools sort -O bam -T ~{tmpDir} -o ~{outputPrefix}_filtered.bam -"
+  command = command + " | samtools sort -O bam ~{'-T' + tmpDir} -o ~{outputPrefix}_filtered.bam -"
   os.system(command)
   CODE
   samtools index ~{outputPrefix}_filtered.bam ~{outputPrefix}_filtered.bai
