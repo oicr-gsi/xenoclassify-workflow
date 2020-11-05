@@ -20,6 +20,7 @@
           "xenoClassify.fastqR1": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R1_001.fastq.subset.fastq.gz",
           "xenoClassify.fastqR2": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R2_001.fastq.subset.fastq.gz",
           "xenoClassify.outputFileNamePrefix": "Xenoclassify",
+          "xenoClassify.filterHost.tmpDir": "$TMP",
           "xenoClassify.refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
           "xenoClassify.refGraft": "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
         }
@@ -32,6 +33,7 @@
           "xenoClassify.fastqR2": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R2_001.fastq.subset.fastq.gz",
           "xenoClassify.outputFileNamePrefix": "Xenoclassify",
           "xenoClassify.filterHost.filterTags": ["host", "both", "neither"],
+          "xenoClassify.filterHost.tmpDir": "$TMP",
           "xenoClassify.refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
           "xenoClassify.refGraft": "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
         }

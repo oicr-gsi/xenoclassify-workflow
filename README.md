@@ -40,6 +40,7 @@ Classify parameters use various settings for mapping score of reads, these are f
 
 Paramter|Value
 ---|---
+rG | String Read group from shesmu, random strings as a default
 sortBam.jobMemory | Int? default is 10 gigabytes
 sortBam.modules | String? (optional, default is samtools/0.1.19)
 sortBam.timeout | Int (no need to set it, default is 72hr)
@@ -53,6 +54,7 @@ filterHost.modules | String? (optional, default is samtools/0.1.19)
 filterHost.jobMemory | Int? (optional, default is 5 gigabytes)
 filterHost.timeout | Int (no need to set it, default is 72hr)
 filterHost.filterTags |  Array[String] array of tags to remove respective reads
+filterHost.tmpDir | String? (optional, if set the dir is used for temporary files. $TMP is preferred
 
 ## Required Inputs:
 
@@ -67,6 +69,7 @@ Only one parameter is required, fastqR1. Normally this workflow would run with t
 Output | Type | Description
 ---|---|---
 `filteredResults`|File|bam with filtered results (no host reads)
+`filteredResultsIndex`|File|index for file with filtered results
 `jsonReport`|File|json file with simple stats showing numbers for different classification tags
 
 ## Niassa + Cromwell

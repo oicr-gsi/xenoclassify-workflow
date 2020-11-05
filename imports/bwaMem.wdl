@@ -2,24 +2,8 @@ version 1.0
 
 workflow bwaMem {
     input {
-        File fastqR1
-        File? fastqR2
-        String? readGroups
-        String outputFileNamePrefix = "output"
-        Int numChunk = 1
-        Boolean doTrim = false
-        Int trimMinLength = 1
-        Int trimMinQuality = 0
-        String runBwaMemModules
-        String runBwaMemRef
-        String adapter1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC"
-        String adapter2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"
         Int adapterTrimmingLog_timeout = 48
         Int adapterTrimmingLog_jobMemory = 12
-        Int adapterTrimming_timeout = 48
-        Int adapterTrimming_jobMemory = 16
-        String? adapterTrimming_addParam
-        String adapterTrimming_modules = "cutadapt/1.8.3"
         Int indexBam_timeout = 48
         String indexBam_modules = "samtools/1.9"
         Int indexBam_jobMemory = 12
@@ -30,6 +14,12 @@ workflow bwaMem {
         Int runBwaMem_jobMemory = 32
         Int runBwaMem_threads = 8
         String? runBwaMem_addParam
+        String runBwaMem_bwaRef
+        String runBwaMem_modules
+        Int adapterTrimming_timeout = 48
+        Int adapterTrimming_jobMemory = 16
+        String? adapterTrimming_addParam
+        String adapterTrimming_modules = "cutadapt/1.8.3"
         Int slicerR2_timeout = 48
         Int slicerR2_jobMemory = 16
         String slicerR2_modules = "slicer/0.3.0"
@@ -38,27 +28,21 @@ workflow bwaMem {
         String slicerR1_modules = "slicer/0.3.0"
         Int countChunkSize_timeout = 48
         Int countChunkSize_jobMemory = 16
+        File fastqR1
+        File? fastqR2
+        String readGroups
+        String outputFileNamePrefix = "output"
+        Int numChunk = 1
+        Boolean doTrim = false
+        Int trimMinLength = 1
+        Int trimMinQuality = 0
+        String adapter1 = "AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC"
+        String adapter2 = "AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"
     }
 
     parameter_meta {
-        fastqR1: "fastq file for read 1"
-        fastqR2: "fastq file for read 2"
-        readGroups: "Complete read group header line"
-        outputFileNamePrefix: "Prefix for output file"
-        numChunk: "number of chunks to split fastq file [1, no splitting]"
-        doTrim: "if true, adapters will be trimmed before alignment"
-        trimMinLength: "minimum length of reads to keep [1]"
-        trimMinQuality: "minimum quality of read ends to keep [0]"
-        runBwaMemModules: "modules for runBwaMem task"
-        runBwaMemRef: "Reference genome assembly for runBwaMem task"
-        adapter1: "adapter sequence to trim from read 1 [AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC]"
-        adapter2: "adapter sequence to trim from read 2 [AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT]"
         adapterTrimmingLog_timeout: "Hours before task timeout"
         adapterTrimmingLog_jobMemory: "Memory allocated indexing job"
-        adapterTrimming_timeout: "Hours before task timeout"
-        adapterTrimming_jobMemory: "Memory allocated for this job"
-        adapterTrimming_addParam: "Additional cutadapt parameters"
-        adapterTrimming_modules: "Required environment modules"       
         indexBam_timeout: "Hours before task timeout"
         indexBam_modules: "Modules for running indexing job"
         indexBam_jobMemory: "Memory allocated indexing job"
@@ -69,6 +53,12 @@ workflow bwaMem {
         runBwaMem_jobMemory: "Memory allocated for this job"
         runBwaMem_threads: "Requested CPU threads"
         runBwaMem_addParam: "Additional BWA parameters"
+        runBwaMem_bwaRef: "The reference genome to align the sample with by BWA"
+        runBwaMem_modules: "Required environment modules"
+        adapterTrimming_timeout: "Hours before task timeout"
+        adapterTrimming_jobMemory: "Memory allocated for this job"
+        adapterTrimming_addParam: "Additional cutadapt parameters"
+        adapterTrimming_modules: "Required environment modules"
         slicerR2_timeout: "Hours before task timeout"
         slicerR2_jobMemory: "Memory allocated for this job"
         slicerR2_modules: "Required environment modules"
@@ -77,35 +67,46 @@ workflow bwaMem {
         slicerR1_modules: "Required environment modules"
         countChunkSize_timeout: "Hours before task timeout"
         countChunkSize_jobMemory: "Memory allocated for this job"
+        fastqR1: "fastq file for read 1"
+        fastqR2: "fastq file for read 2"
+        readGroups: "Complete read group header line"
+        outputFileNamePrefix: "Prefix for output file"
+        numChunk: "number of chunks to split fastq file [1, no splitting]"
+        doTrim: "if true, adapters will be trimmed before alignment"
+        trimMinLength: "minimum length of reads to keep [1]"
+        trimMinQuality: "minimum quality of read ends to keep [0]"
+        adapter1: "adapter sequence to trim from read 1 [AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC]"
+        adapter2: "adapter sequence to trim from read 2 [AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT]"
+
     }
 
     if (numChunk > 1) {
         call countChunkSize {
             input:
-            fastqR1 = fastqR1,
-            numChunk = numChunk,
+            timeout = countChunkSize_timeout,
             jobMemory = countChunkSize_jobMemory,
-            timeout = countChunkSize_timeout
+            fastqR1 = fastqR1,
+            numChunk = numChunk
         }
     
         call slicer as slicerR1 { 
             input: 
-            fastqR = fastqR1,
-            chunkSize = countChunkSize.chunkSize,
+            timeout = slicerR1_timeout,
             jobMemory = slicerR1_jobMemory,
             modules = slicerR1_modules,
-            timeout = slicerR1_timeout
+            fastqR = fastqR1,
+            chunkSize = countChunkSize.chunkSize
         }
         if (defined(fastqR2)) {
             # workaround for converting File? to File
             File fastqR2_ = select_all([fastqR2])[0]
             call slicer as slicerR2 {
                 input:
-                fastqR = fastqR2_,
-                chunkSize = countChunkSize.chunkSize,
+                timeout = slicerR2_timeout,
                 jobMemory = slicerR2_jobMemory,
                 modules = slicerR2_modules,
-                timeout = slicerR2_timeout
+                fastqR = fastqR2_,
+                chunkSize = countChunkSize.chunkSize
             }
         }
     }
@@ -127,56 +128,56 @@ workflow bwaMem {
         if (doTrim) {
             call adapterTrimming { 
                 input:
+                timeout = adapterTrimming_timeout,
+                jobMemory = adapterTrimming_jobMemory,
+                addParam = adapterTrimming_addParam,
+                modules = adapterTrimming_modules,
                 fastqR1 = p.left,
                 fastqR2 = p.right,
                 trimMinLength = trimMinLength,
                 trimMinQuality = trimMinQuality,
                 adapter1 = adapter1,
-                adapter2 = adapter2,
-                timeout = adapterTrimming_timeout,
-                jobMemory = adapterTrimming_jobMemory,
-                addParam = adapterTrimming_addParam,
-                modules = adapterTrimming_modules
+                adapter2 = adapter2
             }
         }
         call runBwaMem  { 
                 input: 
-                read1s = select_first([adapterTrimming.resultR1, p.left]),
-                read2s = if (defined(fastqR2)) then select_first([adapterTrimming.resultR2, p.right]) else fastqR2,
-                bwaRef = runBwaMemRef,
-                readGroups = readGroups,
                 timeout = runBwaMem_timeout,
                 jobMemory = runBwaMem_jobMemory,
                 threads = runBwaMem_threads,
                 addParam = runBwaMem_addParam,
-                modules = runBwaMemModules
+                bwaRef = runBwaMem_bwaRef,
+                modules = runBwaMem_modules,
+                read1s = select_first([adapterTrimming.resultR1, p.left]),
+                read2s = if (defined(fastqR2)) then select_first([adapterTrimming.resultR2, p.right]) else fastqR2,
+                readGroups = readGroups
         }    
     }
 
     call bamMerge {
         input:
-        bams = runBwaMem.outputBam,
-        outputFileNamePrefix = outputFileNamePrefix,
         timeout = bamMerge_timeout,
         modules = bamMerge_modules,
-        jobMemory = bamMerge_jobMemory
+        jobMemory = bamMerge_jobMemory,
+        bams = runBwaMem.outputBam,
+        outputFileNamePrefix = outputFileNamePrefix
     }
 
     call indexBam { 
         input: 
-        inputBam = bamMerge.outputMergedBam,
         timeout = indexBam_timeout,
         modules = indexBam_modules,
-        jobMemory = indexBam_jobMemory
+        jobMemory = indexBam_jobMemory,
+        inputBam = bamMerge.outputMergedBam
     }
 
     if (doTrim) {
         call adapterTrimmingLog {
             input:
-            inputLogs = select_all(adapterTrimming.log),
-            outputFileNamePrefix = outputFileNamePrefix,
             timeout = adapterTrimmingLog_timeout,
             jobMemory = adapterTrimmingLog_jobMemory,
+            inputLogs = select_all(adapterTrimming.log),
+            outputFileNamePrefix = outputFileNamePrefix,
             numChunk = numChunk,
             singleEnded = if (defined(fastqR2)) then false else true
         }
@@ -365,7 +366,7 @@ task runBwaMem {
     input {
         File read1s
         File? read2s
-        String? readGroups
+        String readGroups
         String modules
         String bwaRef
         String? addParam
@@ -390,11 +391,11 @@ task runBwaMem {
     String tmpDir = "tmp/"
 
     command <<<
-        module load ~{modules} 2>/dev/null
         set -euo pipefail
         mkdir -p ~{tmpDir}
         bwa mem -M \
-            -t ~{threads} ~{addParam} ~{"-R" + readGroups} \
+            -t ~{threads} ~{addParam}  \
+            -R  ~{readGroups} \
             ~{bwaRef} \
             ~{read1s} \
             ~{read2s} \
