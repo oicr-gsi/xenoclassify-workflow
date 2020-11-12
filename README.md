@@ -44,6 +44,7 @@ rG | String Read group from shesmu, random strings as a default
 sortBam.jobMemory | Int? default is 10 gigabytes
 sortBam.modules | String? (optional, default is samtools/0.1.19)
 sortBam.timeout | Int (no need to set it, default is 72hr)
+sortBam.tmpDir | String? (optional, if set the dir is used for temporary files. $TMP is preferred
 classify.modules | String? (optional, default is xenoclassify/1.0, module with classify script)
 classify.jobMemory | Int? default is 10 gigabytes
 classify.neitherThreshold | Int? parameter for classify script, default is 20

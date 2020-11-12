@@ -96,16 +96,18 @@ task sortBam {
 input {
 	File inBam
 	Int jobMemory  = 10
+        String? tmpDir
         String modules = "samtools/1.9"
         Int timeout = 72
 }
 
 command <<<
- samtools sort -n ~{inBam} -o ~{basename(inBam, '.bam')}_sorted.bam
+ samtools sort -n ~{inBam} ~{'-T ' + tmpDir} -o ~{basename(inBam, '.bam')}_sorted.bam
 >>>
 
 parameter_meta {
  inBam: "Input .bam file"
+ tmpDir: "Optionally supply tmpDir for writing chunk bam files for sorting"
  jobMemory: "Memory allocated to sort task"
  modules: "Names and versions of modules needed for sorting"
  timeout: "Timeout for this task in hours"
@@ -224,7 +226,7 @@ command <<<
   for t in tags:
     command = command + " | grep -v \'CL:Z:" + t + "\'"
   
-  command = command + " | samtools sort -O bam ~{'-T' + tmpDir} -o ~{outputPrefix}_filtered.bam -"
+  command = command + " | samtools sort -O bam ~{'-T ' + tmpDir} -o ~{outputPrefix}_filtered.bam -"
   os.system(command)
   CODE
   samtools index ~{outputPrefix}_filtered.bam ~{outputPrefix}_filtered.bai
