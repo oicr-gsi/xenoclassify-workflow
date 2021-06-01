@@ -1,0 +1,155 @@
+[
+    {
+        "arguments": {
+            "xenoClassify.bwaMemModules": null,
+            "xenoClassify.classify.difference": null,
+            "xenoClassify.classify.jobMemory": null,
+            "xenoClassify.classify.modules": null,
+            "xenoClassify.classify.neitherThreshold": null,
+            "xenoClassify.classify.timeout": null,
+            "xenoClassify.classify.tolerance": null,
+            "xenoClassify.fastqR1": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R1_001.fastq.subset.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "xenoClassify.fastqR2": {
+                "contents": {
+                    "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R2_001.fastq.subset.fastq.gz",
+                    "externalIds": [
+                        {
+                            "id": "TEST",
+                            "provider": "TEST"
+                        }
+                    ]
+                },
+                "type": "EXTERNAL"
+            },
+            "xenoClassify.filterHost.filterTags": [
+                "host",
+                "both",
+                "neither"
+            ],
+            "xenoClassify.filterHost.jobMemory": null,
+            "xenoClassify.filterHost.modules": null,
+            "xenoClassify.filterHost.timeout": null,
+            "xenoClassify.filterHost.tmpDir": "$TMP",
+            "xenoClassify.generateGraftBam.adapter1": null,
+            "xenoClassify.generateGraftBam.adapter2": null,
+            "xenoClassify.generateGraftBam.adapterTrimmingLog_jobMemory": null,
+            "xenoClassify.generateGraftBam.adapterTrimmingLog_timeout": null,
+            "xenoClassify.generateGraftBam.adapterTrimming_addParam": null,
+            "xenoClassify.generateGraftBam.adapterTrimming_jobMemory": null,
+            "xenoClassify.generateGraftBam.adapterTrimming_modules": null,
+            "xenoClassify.generateGraftBam.adapterTrimming_timeout": null,
+            "xenoClassify.generateGraftBam.bamMerge_jobMemory": null,
+            "xenoClassify.generateGraftBam.bamMerge_modules": null,
+            "xenoClassify.generateGraftBam.bamMerge_timeout": null,
+            "xenoClassify.generateGraftBam.countChunkSize_jobMemory": null,
+            "xenoClassify.generateGraftBam.countChunkSize_timeout": null,
+            "xenoClassify.generateGraftBam.doTrim": null,
+            "xenoClassify.generateGraftBam.indexBam_jobMemory": null,
+            "xenoClassify.generateGraftBam.indexBam_modules": null,
+            "xenoClassify.generateGraftBam.indexBam_timeout": null,
+            "xenoClassify.generateGraftBam.numChunk": null,
+            "xenoClassify.generateGraftBam.runBwaMem_addParam": null,
+            "xenoClassify.generateGraftBam.runBwaMem_jobMemory": null,
+            "xenoClassify.generateGraftBam.runBwaMem_threads": null,
+            "xenoClassify.generateGraftBam.runBwaMem_timeout": null,
+            "xenoClassify.generateGraftBam.slicerR1_jobMemory": null,
+            "xenoClassify.generateGraftBam.slicerR1_modules": null,
+            "xenoClassify.generateGraftBam.slicerR1_timeout": null,
+            "xenoClassify.generateGraftBam.slicerR2_jobMemory": null,
+            "xenoClassify.generateGraftBam.slicerR2_modules": null,
+            "xenoClassify.generateGraftBam.slicerR2_timeout": null,
+            "xenoClassify.generateGraftBam.trimMinLength": null,
+            "xenoClassify.generateGraftBam.trimMinQuality": null,
+            "xenoClassify.generateHostBam.adapter1": null,
+            "xenoClassify.generateHostBam.adapter2": null,
+            "xenoClassify.generateHostBam.adapterTrimmingLog_jobMemory": null,
+            "xenoClassify.generateHostBam.adapterTrimmingLog_timeout": null,
+            "xenoClassify.generateHostBam.adapterTrimming_addParam": null,
+            "xenoClassify.generateHostBam.adapterTrimming_jobMemory": null,
+            "xenoClassify.generateHostBam.adapterTrimming_modules": null,
+            "xenoClassify.generateHostBam.adapterTrimming_timeout": null,
+            "xenoClassify.generateHostBam.bamMerge_jobMemory": null,
+            "xenoClassify.generateHostBam.bamMerge_modules": null,
+            "xenoClassify.generateHostBam.bamMerge_timeout": null,
+            "xenoClassify.generateHostBam.countChunkSize_jobMemory": null,
+            "xenoClassify.generateHostBam.countChunkSize_timeout": null,
+            "xenoClassify.generateHostBam.doTrim": null,
+            "xenoClassify.generateHostBam.indexBam_jobMemory": null,
+            "xenoClassify.generateHostBam.indexBam_modules": null,
+            "xenoClassify.generateHostBam.indexBam_timeout": null,
+            "xenoClassify.generateHostBam.numChunk": null,
+            "xenoClassify.generateHostBam.runBwaMem_addParam": null,
+            "xenoClassify.generateHostBam.runBwaMem_jobMemory": null,
+            "xenoClassify.generateHostBam.runBwaMem_threads": null,
+            "xenoClassify.generateHostBam.runBwaMem_timeout": null,
+            "xenoClassify.generateHostBam.slicerR1_jobMemory": null,
+            "xenoClassify.generateHostBam.slicerR1_modules": null,
+            "xenoClassify.generateHostBam.slicerR1_timeout": null,
+            "xenoClassify.generateHostBam.slicerR2_jobMemory": null,
+            "xenoClassify.generateHostBam.slicerR2_modules": null,
+            "xenoClassify.generateHostBam.slicerR2_timeout": null,
+            "xenoClassify.generateHostBam.trimMinLength": null,
+            "xenoClassify.generateHostBam.trimMinQuality": null,
+            "xenoClassify.outputFileNamePrefix": "Xenoclassify",
+            "xenoClassify.rG": "'@RG\\\\tID:TEST-RUN_XENO\\\\tLB:XENOTEST\\\\tPL:ILLUMINA\\\\tPU:TEST-RUN_XENO\\\\tSM:TEST_XENOTEST_X'",
+            "xenoClassify.refGraft": "$HG19_BWA_INDEX_ROOT/hg19_random.fa",
+            "xenoClassify.refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
+            "xenoClassify.sortGraftBam.jobMemory": null,
+            "xenoClassify.sortGraftBam.modules": null,
+            "xenoClassify.sortGraftBam.timeout": null,
+            "xenoClassify.sortGraftBam.tmpDir": null,
+            "xenoClassify.sortHostBam.jobMemory": null,
+            "xenoClassify.sortHostBam.modules": null,
+            "xenoClassify.sortHostBam.timeout": null,
+            "xenoClassify.sortHostBam.tmpDir": null
+        },
+        "description": "Xenoclassify workflow test",
+        "engineArguments": {},
+        "id": "PCSI_0044_DOWNSAMPLED_ONLYGRAFT",
+        "metadata": {
+            "xenoClassify.filteredResults": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "xenoClassify.filteredResultsIndex": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "xenoClassify.jsonReport": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            }
+        },
+        "validators": [
+            {
+                "metrics_calculate": "@CHECKOUT@/./calculate.sh",
+                "metrics_compare": "@CHECKOUT@/./compare.sh",
+                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/PCSI_0044_DOWNSAMPLED_ONLYGRAFT.metrics",
+                "type": "script"
+            }
+        ]
+    }
+]

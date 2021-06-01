@@ -80,7 +80,7 @@ meta {
   ]
   output_meta: {
     filteredResults: "bam file without host (most commonly mouse) reads",
-    filteredResults: "index file for file without host reads",
+    filteredResultsIndex: "index file for file without host reads",
     jsonReport: "a simple stats file with counts for differently tagged reads" 
   }
 }
