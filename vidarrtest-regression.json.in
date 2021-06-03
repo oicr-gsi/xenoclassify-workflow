@@ -102,7 +102,7 @@
             "xenoClassify.generateHostBam.trimMinLength": null,
             "xenoClassify.generateHostBam.trimMinQuality": null,
             "xenoClassify.outputFileNamePrefix": "Xenoclassify",
-            "xenoClassify.rG": "'@RG\\\\tID:TEST-RUN_XENO\\\\tLB:XENOTEST\\\\tPL:ILLUMINA\\\\tPU:TEST-RUN_XENO\\\\tSM:TEST_XENOTEST_X'",
+            "xenoClassify.rG": "'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'",
             "xenoClassify.refGraft": "$HG19_BWA_INDEX_ROOT/hg19_random.fa",
             "xenoClassify.refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
             "xenoClassify.sortGraftBam.jobMemory": null,
