@@ -1,0 +1,64 @@
+## Commands
+This section lists command(s) run by WORKFLOW workflow
+
+* Running WORKFLOW
+
+Xenoclassify aligns data to host and graft genomes using imported bwaMem workflow and then classify reads depending on their alignment scores.
+
+Sort bam files by read name
+
+```
+ samtools sort -n INPUT_BAM -T TMP_DIR -o BAM_BASENAME_sorted.bam
+
+```
+
+Classify reads with xenoclassify.py script:
+
+```
+ 
+ xenoclassify.py is run on name-sorted bams from host and graft
+
+ python3 $XENOCLASSIFY_ROOT/bin/xenoclassify/xenoclassify.py -H HOST_BAM -G GRAFT_BAM -O . -b -p PREFIX
+                                                             -n NEITHER_THRESHOLD -t TOLERANCE -d DIFFERENCE
+ ...
+
+ samtools view PREFIX_output.bam | awk \'{print \$NF}\' | sort | uniq -c"
+ counts = os.popen(command).read().splitlines() 
+
+ Following Python code looks for host/graft (+ neither, both) classification and writes a summary into .json file
+
+ for line in counts:
+   if line.find('CL:Z:') == 0:
+         continue
+   line = line.rstrip()
+   line = re.sub('CL:Z:', '', line)
+   tmp = line.split()
+   jsonDict[tmp[1]] = tmp[0]
+
+ with open(json_name, 'w') as json_file:
+   json.dump(jsonDict, json_file)
+ 
+```
+
+Filter reads matching the supplied classification(s) and provision filtered .bam along with its index
+
+```
+ 
+  The following python code splits the supplied tags and then 
+  removes all matching reads from the bam file  
+  
+  ...
+
+  inputTags =  "~{sep=' ' filterTags}"
+  tags = inputTags.split()
+  
+  command = "samtools view -h ~{xenoClassifyBam}"
+  for t in tags:
+    command = command + " | grep -v \'CL:Z:" + t + "\'"
+  
+  command = command + " | samtools sort -O bam ~{'-T ' + tmpDir} -o ~{outputPrefix}_filtered.bam -"
+  os.system(command)
+  
+  samtools index ~{outputPrefix}_filtered.bam ~{outputPrefix}_filtered.bai
+
+```
