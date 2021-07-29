@@ -1,7 +1,9 @@
 # xenoClassify
 
 Xenoclassify 1.0: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).
-![Xenoclassify, how it works](docs/xenoclassify_wf.png)
+
+ ![Xenoclassify, how it works](docs/xenoclassify_wf.png)
+
 
 ## Overview
 
