@@ -63,7 +63,7 @@ parameter_meta {
 meta {
   author: "Peter Ruzanov"
   email: "peter.ruzanov@oicr.on.ca"
-  description: "Xenoclassify 1.0"
+  description: "Xenoclassify 1.0: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).\n\n ![Xenoclassify, how it works](docs/xenoclassify_wf.png)\n"
   dependencies: [
     {
       name: "bwa/0.7.12",
