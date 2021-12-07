@@ -145,8 +145,8 @@
         },
         "validators": [
             {
-                "metrics_calculate": "@CHECKOUT@/./calculate.sh",
-                "metrics_compare": "@CHECKOUT@/./compare.sh",
+                "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
+                "metrics_compare": "@CHECKOUT@/tests/compare.sh",
                 "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/PCSI_0044_DOWNSAMPLED_ONLYGRAFT.metrics",
                 "type": "script"
             }
