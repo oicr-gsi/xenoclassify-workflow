@@ -10,6 +10,7 @@ Xenoclassify 1.0: This Seqware workflow classifies short-read sequencing data ge
 ## Dependencies
 
 * [bwa 0.7.12](https://github.com/lh3/bwa/archive/0.7.12.tar.gz)
+* [star 2.7.6a](https://github.com/alexdobin/STAR/archive/2.7.6a.tar.gz)
 * [samtools 1.9](https://github.com/samtools/samtools/archive/1.9.tar.gz)
 * [xenoclassify 1.0](https://github.com/oicr-gsi/xenoclassify/archive/1.1.tar.gz)
 
@@ -27,82 +28,135 @@ java -jar cromwell.jar run xenoclassify.wdl --inputs inputs.json
 Parameter|Value|Description
 ---|---|---
 `fastqR1`|File|fastq file for read 1
+`fastqR2`|File|fastq file for read 2
 
 
 #### Optional workflow parameters:
 Parameter|Value|Default|Description
 ---|---|---|---
-`fastqR2`|File?|None|fastq file for read 2
-`refHost`|String|"$MM10_BWA_INDEX_ROOT/mm10.fa"|The reference Host genome to align the sample with by BWA
-`refGraft`|String|"$HG19_BWA_INDEX_ROOT/hg19_random.fa"|The reference Graft genome to align the sample with by BWA
+`refHost`|String|"$MM10_BWA_INDEX_ROOT/mm10.fa"|The reference Host genome to align the sample with by either STAR or BWA
+`refGraft`|String|"$HG19_BWA_INDEX_ROOT/hg19_random.fa"|The reference Graft genome to align the sample with by either STAR or BWA
+`libraryDesign`|String|"WG"|Supported library design acronym. We support WG, WT and MR. Default is WG
 `rG`|String|"'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'"|Read group string
-`bwaMemModules`|String|"bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"|modules for bwaMem sub-workflow
+`alignerModules`|String|"bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"|modules for the aligner sub-workflow
 `outputFileNamePrefix`|String|""|Output file name prefix
 
 
 #### Optional task parameters:
 Parameter|Value|Default|Description
 ---|---|---|---
-`generateHostBam.adapterTrimmingLog_timeout`|Int|48|Hours before task timeout
-`generateHostBam.adapterTrimmingLog_jobMemory`|Int|12|Memory allocated indexing job
-`generateHostBam.indexBam_timeout`|Int|48|Hours before task timeout
-`generateHostBam.indexBam_modules`|String|"samtools/1.9"|Modules for running indexing job
-`generateHostBam.indexBam_jobMemory`|Int|12|Memory allocated indexing job
-`generateHostBam.bamMerge_timeout`|Int|72|Hours before task timeout
-`generateHostBam.bamMerge_modules`|String|"samtools/1.9"|Required environment modules
-`generateHostBam.bamMerge_jobMemory`|Int|32|Memory allocated indexing job
-`generateHostBam.runBwaMem_timeout`|Int|96|Hours before task timeout
-`generateHostBam.runBwaMem_jobMemory`|Int|32|Memory allocated for this job
-`generateHostBam.runBwaMem_threads`|Int|8|Requested CPU threads
-`generateHostBam.runBwaMem_addParam`|String?|None|Additional BWA parameters
-`generateHostBam.adapterTrimming_timeout`|Int|48|Hours before task timeout
-`generateHostBam.adapterTrimming_jobMemory`|Int|16|Memory allocated for this job
-`generateHostBam.adapterTrimming_addParam`|String?|None|Additional cutadapt parameters
-`generateHostBam.adapterTrimming_modules`|String|"cutadapt/1.8.3"|Required environment modules
-`generateHostBam.slicerR2_timeout`|Int|48|Hours before task timeout
-`generateHostBam.slicerR2_jobMemory`|Int|16|Memory allocated for this job
-`generateHostBam.slicerR2_modules`|String|"slicer/0.3.0"|Required environment modules
-`generateHostBam.slicerR1_timeout`|Int|48|Hours before task timeout
-`generateHostBam.slicerR1_jobMemory`|Int|16|Memory allocated for this job
-`generateHostBam.slicerR1_modules`|String|"slicer/0.3.0"|Required environment modules
-`generateHostBam.countChunkSize_timeout`|Int|48|Hours before task timeout
-`generateHostBam.countChunkSize_jobMemory`|Int|16|Memory allocated for this job
-`generateHostBam.numChunk`|Int|1|number of chunks to split fastq file [1, no splitting]
-`generateHostBam.doTrim`|Boolean|false|if true, adapters will be trimmed before alignment
-`generateHostBam.trimMinLength`|Int|1|minimum length of reads to keep [1]
-`generateHostBam.trimMinQuality`|Int|0|minimum quality of read ends to keep [0]
-`generateHostBam.adapter1`|String|"AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC"|adapter sequence to trim from read 1 [AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC]
-`generateHostBam.adapter2`|String|"AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"|adapter sequence to trim from read 2 [AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT]
-`generateGraftBam.adapterTrimmingLog_timeout`|Int|48|Hours before task timeout
-`generateGraftBam.adapterTrimmingLog_jobMemory`|Int|12|Memory allocated indexing job
-`generateGraftBam.indexBam_timeout`|Int|48|Hours before task timeout
-`generateGraftBam.indexBam_modules`|String|"samtools/1.9"|Modules for running indexing job
-`generateGraftBam.indexBam_jobMemory`|Int|12|Memory allocated indexing job
-`generateGraftBam.bamMerge_timeout`|Int|72|Hours before task timeout
-`generateGraftBam.bamMerge_modules`|String|"samtools/1.9"|Required environment modules
-`generateGraftBam.bamMerge_jobMemory`|Int|32|Memory allocated indexing job
-`generateGraftBam.runBwaMem_timeout`|Int|96|Hours before task timeout
-`generateGraftBam.runBwaMem_jobMemory`|Int|32|Memory allocated for this job
-`generateGraftBam.runBwaMem_threads`|Int|8|Requested CPU threads
-`generateGraftBam.runBwaMem_addParam`|String?|None|Additional BWA parameters
-`generateGraftBam.adapterTrimming_timeout`|Int|48|Hours before task timeout
-`generateGraftBam.adapterTrimming_jobMemory`|Int|16|Memory allocated for this job
-`generateGraftBam.adapterTrimming_addParam`|String?|None|Additional cutadapt parameters
-`generateGraftBam.adapterTrimming_modules`|String|"cutadapt/1.8.3"|Required environment modules
-`generateGraftBam.slicerR2_timeout`|Int|48|Hours before task timeout
-`generateGraftBam.slicerR2_jobMemory`|Int|16|Memory allocated for this job
-`generateGraftBam.slicerR2_modules`|String|"slicer/0.3.0"|Required environment modules
-`generateGraftBam.slicerR1_timeout`|Int|48|Hours before task timeout
-`generateGraftBam.slicerR1_jobMemory`|Int|16|Memory allocated for this job
-`generateGraftBam.slicerR1_modules`|String|"slicer/0.3.0"|Required environment modules
-`generateGraftBam.countChunkSize_timeout`|Int|48|Hours before task timeout
-`generateGraftBam.countChunkSize_jobMemory`|Int|16|Memory allocated for this job
-`generateGraftBam.numChunk`|Int|1|number of chunks to split fastq file [1, no splitting]
-`generateGraftBam.doTrim`|Boolean|false|if true, adapters will be trimmed before alignment
-`generateGraftBam.trimMinLength`|Int|1|minimum length of reads to keep [1]
-`generateGraftBam.trimMinQuality`|Int|0|minimum quality of read ends to keep [0]
-`generateGraftBam.adapter1`|String|"AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC"|adapter sequence to trim from read 1 [AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC]
-`generateGraftBam.adapter2`|String|"AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"|adapter sequence to trim from read 2 [AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT]
+`generateHostBamWG.adapterTrimmingLog_timeout`|Int|48|Hours before task timeout
+`generateHostBamWG.adapterTrimmingLog_jobMemory`|Int|12|Memory allocated indexing job
+`generateHostBamWG.indexBam_timeout`|Int|48|Hours before task timeout
+`generateHostBamWG.indexBam_modules`|String|"samtools/1.9"|Modules for running indexing job
+`generateHostBamWG.indexBam_jobMemory`|Int|12|Memory allocated indexing job
+`generateHostBamWG.bamMerge_timeout`|Int|72|Hours before task timeout
+`generateHostBamWG.bamMerge_modules`|String|"samtools/1.9"|Required environment modules
+`generateHostBamWG.bamMerge_jobMemory`|Int|32|Memory allocated indexing job
+`generateHostBamWG.runBwaMem_timeout`|Int|96|Hours before task timeout
+`generateHostBamWG.runBwaMem_jobMemory`|Int|32|Memory allocated for this job
+`generateHostBamWG.runBwaMem_threads`|Int|8|Requested CPU threads
+`generateHostBamWG.runBwaMem_addParam`|String?|None|Additional BWA parameters
+`generateHostBamWG.adapterTrimming_timeout`|Int|48|Hours before task timeout
+`generateHostBamWG.adapterTrimming_jobMemory`|Int|16|Memory allocated for this job
+`generateHostBamWG.adapterTrimming_addParam`|String?|None|Additional cutadapt parameters
+`generateHostBamWG.adapterTrimming_modules`|String|"cutadapt/1.8.3"|Required environment modules
+`generateHostBamWG.slicerR2_timeout`|Int|48|Hours before task timeout
+`generateHostBamWG.slicerR2_jobMemory`|Int|16|Memory allocated for this job
+`generateHostBamWG.slicerR2_modules`|String|"slicer/0.3.0"|Required environment modules
+`generateHostBamWG.slicerR1_timeout`|Int|48|Hours before task timeout
+`generateHostBamWG.slicerR1_jobMemory`|Int|16|Memory allocated for this job
+`generateHostBamWG.slicerR1_modules`|String|"slicer/0.3.0"|Required environment modules
+`generateHostBamWG.countChunkSize_timeout`|Int|48|Hours before task timeout
+`generateHostBamWG.countChunkSize_jobMemory`|Int|16|Memory allocated for this job
+`generateHostBamWG.numChunk`|Int|1|number of chunks to split fastq file [1, no splitting]
+`generateHostBamWG.doTrim`|Boolean|false|if true, adapters will be trimmed before alignment
+`generateHostBamWG.trimMinLength`|Int|1|minimum length of reads to keep [1]
+`generateHostBamWG.trimMinQuality`|Int|0|minimum quality of read ends to keep [0]
+`generateHostBamWG.adapter1`|String|"AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC"|adapter sequence to trim from read 1 [AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC]
+`generateHostBamWG.adapter2`|String|"AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"|adapter sequence to trim from read 2 [AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT]
+`generateGraftBamWG.adapterTrimmingLog_timeout`|Int|48|Hours before task timeout
+`generateGraftBamWG.adapterTrimmingLog_jobMemory`|Int|12|Memory allocated indexing job
+`generateGraftBamWG.indexBam_timeout`|Int|48|Hours before task timeout
+`generateGraftBamWG.indexBam_modules`|String|"samtools/1.9"|Modules for running indexing job
+`generateGraftBamWG.indexBam_jobMemory`|Int|12|Memory allocated indexing job
+`generateGraftBamWG.bamMerge_timeout`|Int|72|Hours before task timeout
+`generateGraftBamWG.bamMerge_modules`|String|"samtools/1.9"|Required environment modules
+`generateGraftBamWG.bamMerge_jobMemory`|Int|32|Memory allocated indexing job
+`generateGraftBamWG.runBwaMem_timeout`|Int|96|Hours before task timeout
+`generateGraftBamWG.runBwaMem_jobMemory`|Int|32|Memory allocated for this job
+`generateGraftBamWG.runBwaMem_threads`|Int|8|Requested CPU threads
+`generateGraftBamWG.runBwaMem_addParam`|String?|None|Additional BWA parameters
+`generateGraftBamWG.adapterTrimming_timeout`|Int|48|Hours before task timeout
+`generateGraftBamWG.adapterTrimming_jobMemory`|Int|16|Memory allocated for this job
+`generateGraftBamWG.adapterTrimming_addParam`|String?|None|Additional cutadapt parameters
+`generateGraftBamWG.adapterTrimming_modules`|String|"cutadapt/1.8.3"|Required environment modules
+`generateGraftBamWG.slicerR2_timeout`|Int|48|Hours before task timeout
+`generateGraftBamWG.slicerR2_jobMemory`|Int|16|Memory allocated for this job
+`generateGraftBamWG.slicerR2_modules`|String|"slicer/0.3.0"|Required environment modules
+`generateGraftBamWG.slicerR1_timeout`|Int|48|Hours before task timeout
+`generateGraftBamWG.slicerR1_jobMemory`|Int|16|Memory allocated for this job
+`generateGraftBamWG.slicerR1_modules`|String|"slicer/0.3.0"|Required environment modules
+`generateGraftBamWG.countChunkSize_timeout`|Int|48|Hours before task timeout
+`generateGraftBamWG.countChunkSize_jobMemory`|Int|16|Memory allocated for this job
+`generateGraftBamWG.numChunk`|Int|1|number of chunks to split fastq file [1, no splitting]
+`generateGraftBamWG.doTrim`|Boolean|false|if true, adapters will be trimmed before alignment
+`generateGraftBamWG.trimMinLength`|Int|1|minimum length of reads to keep [1]
+`generateGraftBamWG.trimMinQuality`|Int|0|minimum quality of read ends to keep [0]
+`generateGraftBamWG.adapter1`|String|"AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC"|adapter sequence to trim from read 1 [AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC]
+`generateGraftBamWG.adapter2`|String|"AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"|adapter sequence to trim from read 2 [AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT]
+`generateHostBamWT.indexBam_timeout`|Int|48|hours before task timeout
+`generateHostBamWT.indexBam_modules`|String|"picard/2.19.2"|modules for running indexing job
+`generateHostBamWT.indexBam_jobMemory`|Int|12|Memory allocated indexing job
+`generateHostBamWT.runStar_timeout`|Int|72|hours before task timeout
+`generateHostBamWT.runStar_jobMemory`|Int|64|Memory allocated for this job
+`generateHostBamWT.runStar_threads`|Int|6|Requested CPU threads
+`generateHostBamWT.runStar_peOvMMp`|Float|0.1|maximum proportion of mismatched bases in the overlap area
+`generateHostBamWT.runStar_peOvNbasesMin`|Int|12|minimum number of overlap bases to trigger mates merging and realignment
+`generateHostBamWT.runStar_chimOutJunForm`|Int?|None|flag to add metadata to chimeric junction output for functionality with starFusion - 1 for metadata, 0 for no metadata
+`generateHostBamWT.runStar_chimNonchimScoDMin`|Int|10|to trigger chimeric detection, the drop in the best non-chimeric alignment score with respect to the read length has to be greater than this value
+`generateHostBamWT.runStar_chimMulmapNmax`|Int|20|maximum number of chimeric multi-alignments
+`generateHostBamWT.runStar_chimScoJunNonGTAG`|Int|-4|penalty for a non-GTAG chimeric junction
+`generateHostBamWT.runStar_chimMulmapScoRan`|Int|3|the score range for multi-mapping chimeras below the best chimeric score
+`generateHostBamWT.runStar_alignIntMax`|Int|100000|maximum intron size
+`generateHostBamWT.runStar_alignMatGapMax`|Int|100000|maximum gap between two mates
+`generateHostBamWT.runStar_alignSJDBOvMin`|Int|10|minimum overhang for annotated spliced alignments
+`generateHostBamWT.runStar_chimJunOvMin`|Int|12|minimum overhang for a chimeric junction
+`generateHostBamWT.runStar_chimSegmin`|Int|12|minimum length of chimeric segment length
+`generateHostBamWT.runStar_multiMax`|Int|-1|multiMax parameter for STAR
+`generateHostBamWT.runStar_saSparsed`|Int|2|saSparsed parameter for STAR
+`generateHostBamWT.runStar_uniqMAPQ`|Int|255|Score for unique mappers
+`generateHostBamWT.runStar_addParam`|String?|None|Additional STAR parameters
+`generateHostBamWT.runStar_genereadSuffix`|String|"ReadsPerGene.out"|ReadsPerGene file suffix
+`generateHostBamWT.runStar_chimericjunctionSuffix`|String|"Chimeric.out"|Suffix for chimeric junction file
+`generateHostBamWT.runStar_transcriptomeSuffix`|String|"Aligned.toTranscriptome.out"|Suffix for transcriptome-aligned file
+`generateHostBamWT.runStar_starSuffix`|String|"Aligned.sortedByCoord.out"|Suffix for sorted file
+`generateGraftBamWT.indexBam_timeout`|Int|48|hours before task timeout
+`generateGraftBamWT.indexBam_modules`|String|"picard/2.19.2"|modules for running indexing job
+`generateGraftBamWT.indexBam_jobMemory`|Int|12|Memory allocated indexing job
+`generateGraftBamWT.runStar_timeout`|Int|72|hours before task timeout
+`generateGraftBamWT.runStar_jobMemory`|Int|64|Memory allocated for this job
+`generateGraftBamWT.runStar_threads`|Int|6|Requested CPU threads
+`generateGraftBamWT.runStar_peOvMMp`|Float|0.1|maximum proportion of mismatched bases in the overlap area
+`generateGraftBamWT.runStar_peOvNbasesMin`|Int|12|minimum number of overlap bases to trigger mates merging and realignment
+`generateGraftBamWT.runStar_chimOutJunForm`|Int?|None|flag to add metadata to chimeric junction output for functionality with starFusion - 1 for metadata, 0 for no metadata
+`generateGraftBamWT.runStar_chimNonchimScoDMin`|Int|10|to trigger chimeric detection, the drop in the best non-chimeric alignment score with respect to the read length has to be greater than this value
+`generateGraftBamWT.runStar_chimMulmapNmax`|Int|20|maximum number of chimeric multi-alignments
+`generateGraftBamWT.runStar_chimScoJunNonGTAG`|Int|-4|penalty for a non-GTAG chimeric junction
+`generateGraftBamWT.runStar_chimMulmapScoRan`|Int|3|the score range for multi-mapping chimeras below the best chimeric score
+`generateGraftBamWT.runStar_alignIntMax`|Int|100000|maximum intron size
+`generateGraftBamWT.runStar_alignMatGapMax`|Int|100000|maximum gap between two mates
+`generateGraftBamWT.runStar_alignSJDBOvMin`|Int|10|minimum overhang for annotated spliced alignments
+`generateGraftBamWT.runStar_chimJunOvMin`|Int|12|minimum overhang for a chimeric junction
+`generateGraftBamWT.runStar_chimSegmin`|Int|12|minimum length of chimeric segment length
+`generateGraftBamWT.runStar_multiMax`|Int|-1|multiMax parameter for STAR
+`generateGraftBamWT.runStar_saSparsed`|Int|2|saSparsed parameter for STAR
+`generateGraftBamWT.runStar_uniqMAPQ`|Int|255|Score for unique mappers
+`generateGraftBamWT.runStar_addParam`|String?|None|Additional STAR parameters
+`generateGraftBamWT.runStar_genereadSuffix`|String|"ReadsPerGene.out"|ReadsPerGene file suffix
+`generateGraftBamWT.runStar_chimericjunctionSuffix`|String|"Chimeric.out"|Suffix for chimeric junction file
+`generateGraftBamWT.runStar_transcriptomeSuffix`|String|"Aligned.toTranscriptome.out"|Suffix for transcriptome-aligned file
+`generateGraftBamWT.runStar_starSuffix`|String|"Aligned.sortedByCoord.out"|Suffix for sorted file
 `sortHostBam.jobMemory`|Int|10|Memory allocated to sort task
 `sortHostBam.tmpDir`|String?|None|Optionally supply tmpDir for writing chunk bam files for sorting
 `sortHostBam.modules`|String|"samtools/1.9"|Names and versions of modules needed for sorting

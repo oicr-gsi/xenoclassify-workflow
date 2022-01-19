@@ -2,42 +2,66 @@ version 1.0
 
 # imports workflows for the top portion of WGSPipeline
 import "imports/bwaMem.wdl" as bwaMem
+import "imports/pull_star.wdl" as star
 
 workflow xenoClassify {
 input {
         File fastqR1
-	File? fastqR2
-	String refHost  = "$MM10_BWA_INDEX_ROOT/mm10.fa"
-	String refGraft = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
+	File fastqR2
+	String refHost    = "$MM10_BWA_INDEX_ROOT/mm10.fa"
+	String refGraft   = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
+        String libraryDesign = "WG"
         String rG = "'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'"
-        String bwaMemModules = "bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
+        String alignerModules = "bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
         String outputFileNamePrefix = ""
 }
 
 String outputPrefix = if outputFileNamePrefix=="" then basename(fastqR1, '.fastq.gz') else outputFileNamePrefix
 
-call bwaMem.bwaMem as generateHostBam {
-  input:
-    fastqR1 = fastqR1, 
-    fastqR2 = fastqR2, 
-    runBwaMem_bwaRef = refHost, 
-    runBwaMem_modules = bwaMemModules,
-    readGroups = rG,
-    outputFileNamePrefix = "host"
-}
+if (libraryDesign == "WG") {
+ call bwaMem.bwaMem as generateHostBamWG {
+   input:
+     fastqR1 = fastqR1, 
+     fastqR2 = fastqR2, 
+     runBwaMem_bwaRef = refHost, 
+     runBwaMem_modules = alignerModules,
+     readGroups = rG,
+     outputFileNamePrefix = "host"
+ }
 
-call bwaMem.bwaMem as generateGraftBam {
-  input:
-    fastqR1 = fastqR1,
-    fastqR2 = fastqR2,
-    runBwaMem_bwaRef = refGraft,
-    runBwaMem_modules = bwaMemModules,
-    readGroups = rG,
-    outputFileNamePrefix = "graft"
-}
+ call bwaMem.bwaMem as generateGraftBamWG {
+   input:
+     fastqR1 = fastqR1,
+     fastqR2 = fastqR2,
+     runBwaMem_bwaRef = refGraft,
+     runBwaMem_modules = alignerModules,
+     readGroups = rG,
+     outputFileNamePrefix = "graft"
+ }
+} 
 
-call sortBam as sortHostBam { input: inBam = generateHostBam.bwaMemBam }
-call sortBam as sortGraftBam { input: inBam = generateGraftBam.bwaMemBam }
+if (libraryDesign == "WT" || libraryDesign == "MR") {
+  Array[Pair[Pair[File, File], String]] inputFastqs = [((fastqR1, fastqR2), rG)]
+  call star.star as generateHostBamWT {
+    input:
+      inputFqsRgs = inputFastqs,
+      runStar_genomeIndexDir = refHost,
+      runStar_modules = alignerModules,
+      outputFileNamePrefix = "host"
+  }
+
+  call star.star as generateGraftBamWT {
+    input:
+      inputFqsRgs = inputFastqs,
+      runStar_genomeIndexDir = refGraft,
+      runStar_modules = alignerModules,
+      outputFileNamePrefix = "graft"
+  }
+}
+  
+
+call sortBam as sortHostBam { input: inBam = select_first([generateHostBamWG.bwaMemBam, generateHostBamWT.starBam]) }
+call sortBam as sortGraftBam { input: inBam = select_first([generateGraftBamWG.bwaMemBam, generateHostBamWT.starBam]) }
 
 call classify { input: hostBam = sortHostBam.sortedBam, graftBam = sortGraftBam.sortedBam, outputPrefix = outputPrefix }
 call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, outputPrefix = outputPrefix }
@@ -52,10 +76,11 @@ output {
 parameter_meta {
   fastqR1: "fastq file for read 1"
   fastqR2: "fastq file for read 2"
-  refHost: "The reference Host genome to align the sample with by BWA"
-  refGraft: "The reference Graft genome to align the sample with by BWA"
+  libraryDesign: "Supported library design acronym. We support WG, WT and MR. Default is WG"
+  refHost: "The reference Host genome to align the sample with by either STAR or BWA"
+  refGraft: "The reference Graft genome to align the sample with by either STAR or BWA"
   rG: "Read group string"
-  bwaMemModules: "modules for bwaMem sub-workflow"
+  alignerModules: "modules for the aligner sub-workflow"
   outputFileNamePrefix: "Output file name prefix"
 }
 
@@ -69,6 +94,10 @@ meta {
       name: "bwa/0.7.12",
       url: "https://github.com/lh3/bwa/archive/0.7.12.tar.gz"
     },
+    {
+      name: "star/2.7.6a",
+      url: "https://github.com/alexdobin/STAR/archive/2.7.6a.tar.gz"
+    }, 
     {
       name: "samtools/1.9",
       url: "https://github.com/samtools/samtools/archive/1.9.tar.gz"

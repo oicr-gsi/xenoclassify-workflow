@@ -1,3 +1,5 @@
+## 1.2 - 2022-01-18
+ - Adding ability to run on WT data (using imported STAR)
 ## 1.1.1 - 2021-05-31
  - Migrating to vidarr
 ## 1.1 - 2020-10-21
