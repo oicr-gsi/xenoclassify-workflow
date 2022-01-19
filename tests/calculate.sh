@@ -4,11 +4,8 @@ set -o errexit
 set -o pipefail
 
 # For bam file we do the md5sum
-
-echo "transcriptome .bam file:"
-find . -name *.bam | xargs md5sum
+module load samtools/1.9
+samtools view Xenoclassify_filtered.bam | md5sum
 
 # For json file we do the md5sum
-
-echo "transcriptome .bam file:"
 find . -name *.json | xargs md5sum
