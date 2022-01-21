@@ -55,13 +55,13 @@ if (libraryDesign == "WT" || libraryDesign == "MR") {
       inputFqsRgs = inputFastqs,
       runStar_genomeIndexDir = refGraft,
       runStar_modules = alignerModules,
-      outputFileNamePrefix = "graft"
+      outputFileNamePrefix = outputFileNamePrefix
   }
 }
   
 
 call sortBam as sortHostBam { input: inBam = select_first([generateHostBamWG.bwaMemBam, generateHostBamWT.starBam]) }
-call sortBam as sortGraftBam { input: inBam = select_first([generateGraftBamWG.bwaMemBam, generateHostBamWT.starBam]) }
+call sortBam as sortGraftBam { input: inBam = select_first([generateGraftBamWG.bwaMemBam, generateGraftBamWT.starBam]) }
 
 call classify { input: hostBam = sortHostBam.sortedBam, graftBam = sortGraftBam.sortedBam, outputPrefix = outputPrefix }
 call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, outputPrefix = outputPrefix }
@@ -70,6 +70,9 @@ call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, outputPrefi
 output {
   File filteredResults = filterHost.outputBam
   File filteredResultsIndex = filterHost.outputBai
+  File? starChimeric = generateGraftBamWT.starChimeric
+  File? transcriptomeBam = generateGraftBamWT.transcriptomeBam
+  File? geneReadFile = generateGraftBamWT.geneReadFile
   File jsonReport = classify.jsonReport
 }
 
@@ -110,6 +113,9 @@ meta {
   output_meta: {
     filteredResults: "bam file without host (most commonly mouse) reads",
     filteredResultsIndex: "index file for file without host reads",
+    starChimeric: "Chimeric Graft junctions, provisioned for WT data only",
+    transcriptomeBam: "transcriptomeBam is a file produced for Graft WT data only",
+    geneReadFile: ".tab file with Graft gene read outs, only for WT data",
     jsonReport: "a simple stats file with counts for differently tagged reads" 
   }
 }
