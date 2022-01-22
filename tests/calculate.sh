@@ -13,5 +13,5 @@ JUNCTIONS="./Xenoclassify.Chimeric.out.junction"
 # Optional files from STAR
 if [[ -f $JUNCTIONS ]];then
   find . -name '*.ReadsPerGene.out.tab' | xargs md5sum
-  sort $JUNCTIONS | md5sum
+  sort -V $JUNCTIONS | md5sum
 fi
