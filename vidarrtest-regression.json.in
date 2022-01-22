@@ -197,6 +197,30 @@
                     }
                 ],
                 "type": "ALL"
+            },
+            "xenoClassify.starChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "xenoClassify.transcriptomeBam": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "xenoClassify.geneReadFile": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
             }
         },
         "validators": [
@@ -403,6 +427,30 @@
                 "contents": [
                     {
                         "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_K562_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "xenoClassify.starChimeric": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "xenoClassify.transcriptomeBam": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                    }
+                ],
+                "type": "ALL"
+            },
+            "xenoClassify.geneReadFile": {
+                "contents": [
+                    {
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
