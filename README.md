@@ -176,6 +176,37 @@ Parameter|Value|Default|Description
 `filterHost.filterTags`|Array[String]|["host"]|Filter reads with these tags
 `filterHost.jobMemory`|Int|5|Memory allocated to filtering task
 `filterHost.timeout`|Int|72|Timeout for this task in hours
+`makeFastq.jobMemory`|Int|24|Memory allocated to the task.
+`makeFastq.overhead`|Int|6|Ovrerhead for calculating heap memory, difference between total and Java-allocated memory
+`makeFastq.timeout`|Int|20|Timeout in hours, needed to override imposed limits.
+`makeFastq.picardParams`|String|"VALIDATION_STRINGENCY=LENIENT"|Additional parameters for picard SamToFastq, Default is VALIDATION_STRINGENCY=LENIENT
+`makeFastq.modules`|String|"samtools/1.9 picard/2.21.2"|Names and versions of required modules.
+`generateFinalBamWT.indexBam_timeout`|Int|48|hours before task timeout
+`generateFinalBamWT.indexBam_modules`|String|"picard/2.19.2"|modules for running indexing job
+`generateFinalBamWT.indexBam_jobMemory`|Int|12|Memory allocated indexing job
+`generateFinalBamWT.runStar_timeout`|Int|72|hours before task timeout
+`generateFinalBamWT.runStar_jobMemory`|Int|64|Memory allocated for this job
+`generateFinalBamWT.runStar_threads`|Int|6|Requested CPU threads
+`generateFinalBamWT.runStar_peOvMMp`|Float|0.1|maximum proportion of mismatched bases in the overlap area
+`generateFinalBamWT.runStar_peOvNbasesMin`|Int|12|minimum number of overlap bases to trigger mates merging and realignment
+`generateFinalBamWT.runStar_chimOutJunForm`|Int?|None|flag to add metadata to chimeric junction output for functionality with starFusion - 1 for metadata, 0 for no metadata
+`generateFinalBamWT.runStar_chimNonchimScoDMin`|Int|10|to trigger chimeric detection, the drop in the best non-chimeric alignment score with respect to the read length has to be greater than this value
+`generateFinalBamWT.runStar_chimMulmapNmax`|Int|20|maximum number of chimeric multi-alignments
+`generateFinalBamWT.runStar_chimScoJunNonGTAG`|Int|-4|penalty for a non-GTAG chimeric junction
+`generateFinalBamWT.runStar_chimMulmapScoRan`|Int|3|the score range for multi-mapping chimeras below the best chimeric score
+`generateFinalBamWT.runStar_alignIntMax`|Int|100000|maximum intron size
+`generateFinalBamWT.runStar_alignMatGapMax`|Int|100000|maximum gap between two mates
+`generateFinalBamWT.runStar_alignSJDBOvMin`|Int|10|minimum overhang for annotated spliced alignments
+`generateFinalBamWT.runStar_chimJunOvMin`|Int|12|minimum overhang for a chimeric junction
+`generateFinalBamWT.runStar_chimSegmin`|Int|12|minimum length of chimeric segment length
+`generateFinalBamWT.runStar_multiMax`|Int|-1|multiMax parameter for STAR
+`generateFinalBamWT.runStar_saSparsed`|Int|2|saSparsed parameter for STAR
+`generateFinalBamWT.runStar_uniqMAPQ`|Int|255|Score for unique mappers
+`generateFinalBamWT.runStar_addParam`|String?|None|Additional STAR parameters
+`generateFinalBamWT.runStar_genereadSuffix`|String|"ReadsPerGene.out"|ReadsPerGene file suffix
+`generateFinalBamWT.runStar_chimericjunctionSuffix`|String|"Chimeric.out"|Suffix for chimeric junction file
+`generateFinalBamWT.runStar_transcriptomeSuffix`|String|"Aligned.toTranscriptome.out"|Suffix for transcriptome-aligned file
+`generateFinalBamWT.runStar_starSuffix`|String|"Aligned.sortedByCoord.out"|Suffix for sorted file
 
 
 ### Outputs
@@ -184,13 +215,17 @@ Output | Type | Description
 ---|---|---
 `filteredResults`|File|bam file without host (most commonly mouse) reads
 `filteredResultsIndex`|File|index file for file without host reads
+`starChimeric`|File?|Chimeric Graft junctions, provisioned for WT data only
+`transcriptomeBam`|File?|transcriptomeBam is a file produced for Graft WT data only
+`geneReadFile`|File?|.tab file with Graft gene read outs, only for WT data
 `jsonReport`|File|a simple stats file with counts for differently tagged reads
 
 
 ## Commands
- This section lists command(s) run by WORKFLOW workflow
+
+ This section lists command(s) run by Xenoclassify workflow
  
- * Running WORKFLOW
+ * Running Xenoclassify workflow
  
  Xenoclassify aligns data to host and graft genomes using imported bwaMem workflow and then classify reads depending on their alignment scores.
  
@@ -241,17 +276,31 @@ Output | Type | Description
    inputTags =  "~{sep=' ' filterTags}"
    tags = inputTags.split()
    
-   command = "samtools view -h ~{xenoClassifyBam}"
+   command = "samtools view -h XENOCLASSIFY_BAM"
    for t in tags:
      command = command + " | grep -v \'CL:Z:" + t + "\'"
    
-   command = command + " | samtools sort -O bam ~{'-T ' + tmpDir} -o ~{outputPrefix}_filtered.bam -"
+   command = command + " | samtools sort -O bam -T  TMP_DIR -o OUTPUT_PREFIX_filtered.bam -"
    os.system(command)
    
-   samtools index ~{outputPrefix}_filtered.bam ~{outputPrefix}_filtered.bai
+   samtools index OUTPUT_PREFIX_filtered.bam OUTPUT_PREFIX_filtered.bai
  
  ```
- ## Support
+ 
+ Extract reads from filtered file into fastq format with picard:
+ 
+ ```
+  set -euo pipefail
+  unset _JAVA_OPTIONS
+  java -Xmx32G -jar picard.jar SamToFastq I=FILTERED_BAM F=FILTERED_1.fastq F2=FILTERED_2.fastq ADDITIONAL_PARAMETERS
+  gzip -c FILTERED_1.fastq > OUTPUT_PREFIX_part_1.fastq.gz
+  gzip -c FILTERED_2.fastq > OUTPUT_PREFIX_part_2.fastq.gz
+ 
+ ```
+ 
+ In addition, we run second pass STAR alignments with reads from the filtered bam extracted into fastq
+
+## Support
 
 For support, please file an issue on the [Github project](https://github.com/oicr-gsi) or send an email to gsi@oicr.on.ca .
 

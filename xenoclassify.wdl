@@ -66,13 +66,25 @@ call sortBam as sortGraftBam { input: inBam = select_first([generateGraftBamWG.b
 call classify { input: hostBam = sortHostBam.sortedBam, graftBam = sortGraftBam.sortedBam, outputPrefix = outputPrefix }
 call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, outputPrefix = outputPrefix }
 
+if (libraryDesign == "WT" || libraryDesign == "MR") {
+
+  call makeFastq { input: inputBam = filterHost.outputBam, outputPrefix = outputPrefix } 
+  Array[Pair[Pair[File, File], String]] filteredFastqs = [((makeFastq.filteredF1, makeFastq.filteredF2), rG)]
+  call star.star as generateFinalBamWT {
+    input:
+      inputFqsRgs = filteredFastqs,
+      runStar_genomeIndexDir = refGraft,
+      runStar_modules = alignerModules,
+      outputFileNamePrefix = outputFileNamePrefix
+  }
+}
 
 output {
-  File filteredResults = filterHost.outputBam
-  File filteredResultsIndex = filterHost.outputBai
-  File? starChimeric = generateGraftBamWT.starChimeric
-  File? transcriptomeBam = generateGraftBamWT.transcriptomeBam
-  File? geneReadFile = generateGraftBamWT.geneReadFile
+  File filteredResults = select_first([generateFinalBamWT.starBam, filterHost.outputBam]) 
+  File filteredResultsIndex = select_first([generateFinalBamWT.starIndex, filterHost.outputBai])
+  File? starChimeric = generateFinalBamWT.starChimeric
+  File? transcriptomeBam = generateFinalBamWT.transcriptomeBam
+  File? geneReadFile = generateFinalBamWT.geneReadFile
   File jsonReport = classify.jsonReport
 }
 
@@ -280,3 +292,49 @@ output {
 
 }
 
+# ====================================
+#   Optional for WT: Make fastq files
+# ====================================
+task makeFastq {
+input {
+  Int jobMemory = 24
+  Int overhead = 6
+  Int timeout = 20
+  File inputBam
+  String outputPrefix
+  String picardParams = "VALIDATION_STRINGENCY=LENIENT"
+  String modules = "samtools/1.9 picard/2.21.2"
+}
+
+Int javaMemory = jobMemory - overhead
+
+command <<<
+ set -euo pipefail
+ unset _JAVA_OPTIONS
+ java -Xmx~{javaMemory}G -jar $PICARD_ROOT/picard.jar SamToFastq I=~{inputBam} F=FILTERED_1.fastq F2=FILTERED_2.fastq ~{picardParams}
+ gzip -c FILTERED_1.fastq > ~{outputPrefix}_part_1.fastq.gz
+ gzip -c FILTERED_2.fastq > ~{outputPrefix}_part_2.fastq.gz
+
+>>>
+
+parameter_meta {
+ inputBam: "Input bam file, BWA-aligned reads"
+ outputPrefix: "Output prefix for the result file"
+ jobMemory: "Memory allocated to the task."
+ overhead: "Ovrerhead for calculating heap memory, difference between total and Java-allocated memory"
+ picardParams: "Additional parameters for picard SamToFastq, Default is VALIDATION_STRINGENCY=LENIENT"
+ modules: "Names and versions of required modules."
+ timeout: "Timeout in hours, needed to override imposed limits."
+}
+
+runtime {
+  memory:  "~{jobMemory} GB"
+  modules: "~{modules}"
+  timeout: "~{timeout}"
+}
+
+output {
+  File filteredF1 = "~{outputPrefix}_part_1.fastq.gz"
+  File filteredF2 = "~{outputPrefix}_part_2.fastq.gz"
+}
+}
