@@ -3,5 +3,16 @@ set -o nounset
 set -o errexit
 set -o pipefail
 
-module load samtools/0.1.19 2>/dev/null
-find . -regex '.*\.bam$' | tail -n 1 | xargs samtools flagstat  | tr '\t' '\n'; echo " " | sort | uniq | tr '\t' '\n'
+# For bam file we do the md5sum
+module load samtools/1.9
+# For json file we do the md5sum
+find . -name *.json | xargs md5sum
+JUNCTIONS="./Xenoclassify.Chimeric.out.junction"
+# Optional files from STAR
+if [[ -f $JUNCTIONS ]];then
+  find . -name '*.ReadsPerGene.out.tab' | xargs md5sum
+  sort -V $JUNCTIONS | md5sum
+  samtools view ./Xenoclassify.Aligned.sortedByCoord.out.bam | md5sum
+else
+  samtools view ./Xenoclassify_filtered.bam | md5sum
+fi

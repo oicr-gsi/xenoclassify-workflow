@@ -1,7 +1,7 @@
 ## Commands
-This section lists command(s) run by WORKFLOW workflow
+This section lists command(s) run by Xenoclassify workflow
 
-* Running WORKFLOW
+* Running Xenoclassify workflow
 
 Xenoclassify aligns data to host and graft genomes using imported bwaMem workflow and then classify reads depending on their alignment scores.
 
@@ -52,13 +52,26 @@ Filter reads matching the supplied classification(s) and provision filtered .bam
   inputTags =  "~{sep=' ' filterTags}"
   tags = inputTags.split()
   
-  command = "samtools view -h ~{xenoClassifyBam}"
+  command = "samtools view -h XENOCLASSIFY_BAM"
   for t in tags:
     command = command + " | grep -v \'CL:Z:" + t + "\'"
   
-  command = command + " | samtools sort -O bam ~{'-T ' + tmpDir} -o ~{outputPrefix}_filtered.bam -"
+  command = command + " | samtools sort -O bam -T  TMP_DIR -o OUTPUT_PREFIX_filtered.bam -"
   os.system(command)
   
-  samtools index ~{outputPrefix}_filtered.bam ~{outputPrefix}_filtered.bai
+  samtools index OUTPUT_PREFIX_filtered.bam OUTPUT_PREFIX_filtered.bai
 
 ```
+
+Extract reads from filtered file into fastq format with picard:
+
+```
+ set -euo pipefail
+ unset _JAVA_OPTIONS
+ java -Xmx32G -jar picard.jar SamToFastq I=FILTERED_BAM F=FILTERED_1.fastq F2=FILTERED_2.fastq ADDITIONAL_PARAMETERS
+ gzip -c FILTERED_1.fastq > OUTPUT_PREFIX_part_1.fastq.gz
+ gzip -c FILTERED_2.fastq > OUTPUT_PREFIX_part_2.fastq.gz
+
+```
+
+In addition, we run second pass STAR alignments with reads from the filtered bam extracted into fastq
