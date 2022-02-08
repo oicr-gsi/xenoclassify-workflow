@@ -18,7 +18,7 @@ input {
 
 String outputPrefix = if outputFileNamePrefix=="" then basename(fastqR1, '.fastq.gz') else outputFileNamePrefix
 
-if (libraryDesign == "WG") {
+if (libraryDesign == "WG" || libraryDesign == "EX" || libraryDesign == "TS") {
  call bwaMem.bwaMem as generateHostBamWG {
    input:
      fastqR1 = fastqR1, 
@@ -91,7 +91,7 @@ output {
 parameter_meta {
   fastqR1: "fastq file for read 1"
   fastqR2: "fastq file for read 2"
-  libraryDesign: "Supported library design acronym. We support WG, WT and MR. Default is WG"
+  libraryDesign: "Supported library design acronym. We support WG, EX, TS, WT and MR. Default is WG"
   refHost: "The reference Host genome to align the sample with by either STAR or BWA"
   refGraft: "The reference Graft genome to align the sample with by either STAR or BWA"
   rG: "Read group string"

@@ -1,3 +1,5 @@
+## 1.2.1 - 2022-02-08
+ - Added support for TS, EX in the workflow
 ## 1.2 - 2022-01-18
  - Adding ability to run on WT data (using imported STAR)
 ## 1.1.1 - 2021-05-31

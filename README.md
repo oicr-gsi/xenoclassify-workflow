@@ -1,6 +1,6 @@
 # xenoClassify
 
-Xenoclassify 1.0: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).
+Xenoclassify 1.2: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).
 
  ![Xenoclassify, how it works](docs/xenoclassify_wf.png)
 
@@ -36,7 +36,7 @@ Parameter|Value|Default|Description
 ---|---|---|---
 `refHost`|String|"$MM10_BWA_INDEX_ROOT/mm10.fa"|The reference Host genome to align the sample with by either STAR or BWA
 `refGraft`|String|"$HG19_BWA_INDEX_ROOT/hg19_random.fa"|The reference Graft genome to align the sample with by either STAR or BWA
-`libraryDesign`|String|"WG"|Supported library design acronym. We support WG, WT and MR. Default is WG
+`libraryDesign`|String|"WG"|Supported library design acronym. We support WG, EX, TS, WT and MR. Default is WG
 `rG`|String|"'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'"|Read group string
 `alignerModules`|String|"bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"|modules for the aligner sub-workflow
 `outputFileNamePrefix`|String|""|Output file name prefix
