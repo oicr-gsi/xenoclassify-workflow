@@ -1,6 +1,6 @@
 # xenoClassify
 
-Xenoclassify 1.2: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).
+Xenoclassify 1.3: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).
 
  ![Xenoclassify, how it works](docs/xenoclassify_wf.png)
 
@@ -27,8 +27,7 @@ java -jar cromwell.jar run xenoclassify.wdl --inputs inputs.json
 #### Required workflow parameters:
 Parameter|Value|Description
 ---|---|---
-`fastqR1`|File|fastq file for read 1
-`fastqR2`|File|fastq file for read 2
+`inputFastqs`|Array[Pair[Pair[File,File],String]]+|Array of fastq files for read 1 and 2 along with rG string
 
 
 #### Optional workflow parameters:
@@ -37,7 +36,6 @@ Parameter|Value|Default|Description
 `refHost`|String|"$MM10_BWA_INDEX_ROOT/mm10.fa"|The reference Host genome to align the sample with by either STAR or BWA
 `refGraft`|String|"$HG19_BWA_INDEX_ROOT/hg19_random.fa"|The reference Graft genome to align the sample with by either STAR or BWA
 `libraryDesign`|String|"WG"|Supported library design acronym. We support WG, EX, TS, WT and MR. Default is WG
-`rG`|String|"'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'"|Read group string
 `alignerModules`|String|"bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"|modules for the aligner sub-workflow
 `outputFileNamePrefix`|String|""|Output file name prefix
 
@@ -227,7 +225,8 @@ Output | Type | Description
  
  * Running Xenoclassify workflow
  
- Xenoclassify aligns data to host and graft genomes using imported bwaMem workflow and then classify reads depending on their alignment scores.
+ Xenoclassify aligns data to host and graft genomes using imported bwaMem (or star) workflow and then classify reads depending on their alignment scores.
+ In the case of STAR we support multi-lane data. WG/EX/TS data are going to be aligned as single-lane data only.
  
  Sort bam files by read name
  

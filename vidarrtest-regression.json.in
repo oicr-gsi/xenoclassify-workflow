@@ -9,30 +9,34 @@
             "xenoClassify.classify.neitherThreshold": null,
             "xenoClassify.classify.timeout": null,
             "xenoClassify.classify.tolerance": null,
-            "xenoClassify.fastqR1": {
-                "contents": {
-                    "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R1_001.fastq.subset.fastq.gz",
-                    "externalIds": [
-                        {
-                            "id": "TEST",
-                            "provider": "TEST"
-                        }
-                    ]
-                },
-                "type": "EXTERNAL"
-            },
-            "xenoClassify.fastqR2": {
-                "contents": {
-                    "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R2_001.fastq.subset.fastq.gz",
-                    "externalIds": [
-                        {
-                            "id": "TEST",
-                            "provider": "TEST"
-                        }
-                    ]
-                },
-                "type": "EXTERNAL"
-            },
+            "xenoClassify.inputFastqs": [
+            "left": {"left":  {
+                        "contents": {
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R1_001.fastq.subset.fastq.gz",
+                            "externalIds": [
+                                {
+                                    "id": "TEST",
+                                    "provider": "TEST"
+                                }
+                            ]
+                        },
+                        "type": "EXTERNAL"
+                     },
+                     "right": {
+                         "contents": {
+                             "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R2_001.fastq.subset.fastq.gz",
+                             "externalIds": [
+                                 {
+                                     "id": "TEST",
+                                     "provider": "TEST"
+                                 }
+                             ]
+                         },
+                        "type": "EXTERNAL"
+                     }
+             },
+            "right": "'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'"
+            ],
             "xenoClassify.filterHost.filterTags": [
                 "host",
                 "both",
@@ -186,7 +190,6 @@
             "xenoClassify.makeFastq.picardParams": null,
             "xenoClassify.makeFastq.timeout": null,
             "xenoClassify.outputFileNamePrefix": "Xenoclassify",
-            "xenoClassify.rG": "'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'",
             "xenoClassify.refGraft": "$HG19_BWA_INDEX_ROOT/hg19_random.fa",
             "xenoClassify.refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
             "xenoClassify.sortGraftBam.jobMemory": null,
@@ -273,30 +276,38 @@
             "xenoClassify.classify.neitherThreshold": null,
             "xenoClassify.classify.timeout": null,
             "xenoClassify.classify.tolerance": null,
-            "xenoClassify.fastqR1": {
-                "contents": {
-                    "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/k562_NoIndex_L001_R1_001.fastq.gz",
-                    "externalIds": [
-                        {
-                            "id": "TEST",
-                            "provider": "TEST"
-                        }
-                    ]
-                },
-                "type": "EXTERNAL"
-            },
-            "xenoClassify.fastqR2": {
-                "contents": {
-                    "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/k562_NoIndex_L001_R2_001.fastq.gz",
-                    "externalIds": [
-                        {
-                            "id": "TEST",
-                            "provider": "TEST"
-                        }
-                    ]
-                },
-                "type": "EXTERNAL"
-            },
+            "left": {"left":  {
+                        "contents": {
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/k562_NoIndex_L001_R1_001.fastq.gz",
+                            "externalIds": [
+                                {
+                                    "id": "TEST",
+                                    "provider": "TEST"
+                                }
+                            ]
+                        },
+                        "type": "EXTERNAL"
+                     },
+                     "right": {
+                         "contents": {
+                             "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/k562_NoIndex_L001_R2_001.fastq.gz",
+                             "externalIds": [
+                                 {
+                                     "id": "TEST",
+                                     "provider": "TEST"
+                                 }
+                             ]
+                         },
+                        "type": "EXTERNAL"
+                     }
+             },
+            "right": "'ID:TEST-RUN_XENO LB:XENOTEST PL:ILLUMINA PU:TEST-RUN_XENO SM:TEST_XENOTEST_X'"
+            ],
+            "xenoClassify.filterHost.filterTags": [
+                "host",
+                "both",
+                "neither"
+            ],
             "xenoClassify.filterHost.filterTags": [
                 "host",
                 "both",
@@ -450,7 +461,6 @@
             "xenoClassify.makeFastq.picardParams": null,
             "xenoClassify.makeFastq.timeout": null,
             "xenoClassify.outputFileNamePrefix": "Xenoclassify",
-            "xenoClassify.rG": "'ID:TEST-RUN_XENO LB:XENOTEST PL:ILLUMINA PU:TEST-RUN_XENO SM:TEST_XENOTEST_X'",
             "xenoClassify.refGraft": "$HG19_STAR_INDEX100_ROOT/",
             "xenoClassify.refHost":  "$MM10_STAR_INDEX100_ROOT/",
             "xenoClassify.sortGraftBam.jobMemory": null,

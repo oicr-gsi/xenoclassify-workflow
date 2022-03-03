@@ -1,3 +1,5 @@
+## 1.3.0 - 2022-03-08
+ - multi-lane STAR support for WT/MR data, some re-design of the workflow
 ## 1.2.1 - 2022-02-08
  - Added support for TS, EX in the workflow
 ## 1.2 - 2022-01-18

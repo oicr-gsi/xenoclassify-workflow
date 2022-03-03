@@ -6,19 +6,21 @@ import "imports/pull_star.wdl" as star
 
 workflow xenoClassify {
 input {
-        File fastqR1
-	File fastqR2
+        Array[Pair[Pair[File, File], String]]+ inputFastqs
 	String refHost    = "$MM10_BWA_INDEX_ROOT/mm10.fa"
 	String refGraft   = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
         String libraryDesign = "WG"
-        String rG = "'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'"
         String alignerModules = "bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
         String outputFileNamePrefix = ""
 }
 
-String outputPrefix = if outputFileNamePrefix=="" then basename(fastqR1, '.fastq.gz') else outputFileNamePrefix
+String outputPrefix = outputFileNamePrefix
+File fastqR1 = inputFastqs[0].left.left
+File fastqR2 = inputFastqs[0].left.right
+String rG = inputFastqs[0].right
 
 if (libraryDesign == "WG" || libraryDesign == "EX" || libraryDesign == "TS") {
+ 
  call bwaMem.bwaMem as generateHostBamWG {
    input:
      fastqR1 = fastqR1, 
@@ -41,7 +43,6 @@ if (libraryDesign == "WG" || libraryDesign == "EX" || libraryDesign == "TS") {
 } 
 
 if (libraryDesign == "WT" || libraryDesign == "MR") {
-  Array[Pair[Pair[File, File], String]] inputFastqs = [((fastqR1, fastqR2), rG)]
   call star.star as generateHostBamWT {
     input:
       inputFqsRgs = inputFastqs,
@@ -63,12 +64,12 @@ if (libraryDesign == "WT" || libraryDesign == "MR") {
 call sortBam as sortHostBam { input: inBam = select_first([generateHostBamWG.bwaMemBam, generateHostBamWT.starBam]) }
 call sortBam as sortGraftBam { input: inBam = select_first([generateGraftBamWG.bwaMemBam, generateGraftBamWT.starBam]) }
 
-call classify { input: hostBam = sortHostBam.sortedBam, graftBam = sortGraftBam.sortedBam, outputPrefix = outputPrefix }
-call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, outputPrefix = outputPrefix }
+call classify { input: hostBam = sortHostBam.sortedBam, graftBam = sortGraftBam.sortedBam, outputPrefix = outputFileNamePrefix }
+call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, outputPrefix = outputFileNamePrefix }
 
 if (libraryDesign == "WT" || libraryDesign == "MR") {
 
-  call makeFastq { input: inputBam = filterHost.outputBam, outputPrefix = outputPrefix } 
+  call makeFastq { input: inputBam = filterHost.outputBam, outputPrefix = outputFileNamePrefix } 
   Array[Pair[Pair[File, File], String]] filteredFastqs = [((makeFastq.filteredF1, makeFastq.filteredF2), rG)]
   call star.star as generateFinalBamWT {
     input:
@@ -89,12 +90,10 @@ output {
 }
 
 parameter_meta {
-  fastqR1: "fastq file for read 1"
-  fastqR2: "fastq file for read 2"
+  inputFastqs: "Array of fastq files for read 1 and 2 along with rG string"
   libraryDesign: "Supported library design acronym. We support WG, EX, TS, WT and MR. Default is WG"
   refHost: "The reference Host genome to align the sample with by either STAR or BWA"
   refGraft: "The reference Graft genome to align the sample with by either STAR or BWA"
-  rG: "Read group string"
   alignerModules: "modules for the aligner sub-workflow"
   outputFileNamePrefix: "Output file name prefix"
 }
@@ -103,7 +102,7 @@ parameter_meta {
 meta {
   author: "Peter Ruzanov"
   email: "peter.ruzanov@oicr.on.ca"
-  description: "Xenoclassify 1.0: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).\n\n ![Xenoclassify, how it works](docs/xenoclassify_wf.png)\n"
+  description: "Xenoclassify 1.3: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).\n\n ![Xenoclassify, how it works](docs/xenoclassify_wf.png)\n"
   dependencies: [
     {
       name: "bwa/0.7.12",
