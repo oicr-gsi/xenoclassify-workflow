@@ -605,15 +605,56 @@
             "xenoClassify.classifyWT.tolerance": null,
             "xenoClassify.inputFastqs": [{
               "left": {
-                 "left": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT_R1_subs.fastq.gz",
-                 "right": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT_R2_subs.fastq.gz"
+                 "left":  {
+                        "contents": {
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT_R1_subs.fastq.gz",
+                            "externalIds": [
+                                {
+                                    "id": "TEST",
+                                    "provider": "TEST"
+                                }
+                            ]
+                        },
+                        "type": "EXTERNAL"
+                     },
+                 "right": {
+                        "contents": {
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT_R2_subs.fastq.gz",
+                            "externalIds": [
+                                {
+                                    "id": "TEST",
+                                    "provider": "TEST"
+                                }
+                            ]
+                        }
                }, 
                "right": "ID:210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT PL:ILLUMINA PU:210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT LB:PTXNASH_0005_Lv_O_PE_349_WT SM:PTXNASH_0005_Lv_O_NAFLD-1 CM:OICR"
              },
              {
               "left": {
-                 "left": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT_R1_subs.fastq.gz",
-                 "right": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT_R2_subs.fastq.gz"
+                 "left": {
+                        "contents": {
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT_R1_subs.fastq.gz", 
+                            "externalIds": [
+                                {
+                                    "id": "TEST",
+                                    "provider": "TEST"
+                                }
+                            ]
+                        },
+                        "type": "EXTERNAL"
+                     },
+                 "right": {
+                        "contents": {
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT_R2_subs.fastq.gz",
+                            "externalIds": [
+                                {
+                                    "id": "TEST",
+                                    "provider": "TEST"
+                                }
+                            ]
+                        }
+               }
               },
               "right": "ID:210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT PL:ILLUMINA PU:210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT LB:PTXNASH_0005_Lv_O_PE_349_WT SM:PTXNASH_0005_Lv_O_NAFLD-1 CM:OICR"
              }
