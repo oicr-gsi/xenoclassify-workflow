@@ -626,11 +626,13 @@
                                     "provider": "TEST"
                                 }
                             ]
-                        }
+                       },
+                        "type": "EXTERNAL"
+                }
                }, 
                "right": "ID:210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT PL:ILLUMINA PU:210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT LB:PTXNASH_0005_Lv_O_PE_349_WT SM:PTXNASH_0005_Lv_O_NAFLD-1 CM:OICR"
-             },
-             {
+            },
+            {
               "left": {
                  "left": {
                         "contents": {
