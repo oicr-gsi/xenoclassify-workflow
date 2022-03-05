@@ -590,7 +590,7 @@
     {
         "arguments": {
             "xenoClassify.libraryDesign": "WT",
-            "xenoClassify.alignerModules": "samtools/1.9 mm10-star-index100/2.6.0c hg19-star-index100/2.6.0c",
+            "xenoClassify.alignerModules": "mm10-star-index100/2.7.6a hg38-star-index100/2.7.6a samtools/1.9",
             "xenoClassify.classifyWG.difference": null,
             "xenoClassify.classifyWG.jobMemory": null,
             "xenoClassify.classifyWG.modules": null,
