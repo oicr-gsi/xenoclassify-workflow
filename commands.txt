@@ -76,3 +76,69 @@ Extract reads from filtered file into fastq format with picard:
 ```
 
 In addition, we run second pass STAR alignments with reads from the filtered bam extracted into fastq
+
+
+Merging reports - this is needed only for multi-lane transcriptome data processing
+For multi-lane data we also add lane identificators
+
+```
+   import json
+   import re
+
+   r = "~{sep=' ' inputReports}"
+   inputJsons = r.split()
+   inputRgs = "~{sep=' ' inputRgs}"
+
+   data = {}
+
+   def jsonRead(fileName):
+       with open(fileName, "r") as f:
+           jsonText = f.readlines()
+           jsonText = "".join(jsonText)
+           jsonText = jsonText.strip()
+       return json.loads(jsonText)
+
+   matches = re.findall('(?<=[ID]:)([\S]*)', inputRgs)
+
+   if len(inputJsons) > 1:
+       for j in range(len(inputJsons)):
+           if matches[j]:
+               data[matches[j]] = jsonRead(inputJsons[j])
+   else:
+       data = jsonRead(inputJsons[0])
+
+   metrics_file = "~{outputPrefix}_tagReport.json"
+   with open(metrics_file, "w") as m:
+       m.write(json.dumps(data, indent=2))
+
+```
+
+Examples of json report for single-lane and multi-lane data:
+
+```
+
+single-lane:
+
+{
+  "both": "286794",
+  "host": "348954",
+  "neither": "1140",
+  "graft": "5607744"
+}
+
+multi-lane:
+
+{
+  "210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT": {
+    "both": "13188",
+    "host": "5184",
+    "graft": "233018"
+  },
+  "210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT": {
+    "both": "11904",
+    "host": "5076",
+    "graft": "217000"
+  }
+}
+
+```
