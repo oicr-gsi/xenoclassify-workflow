@@ -346,12 +346,9 @@ Output | Type | Description
  
     matches = re.findall('(?<=[ID]:)([\S]*)', inputRgs)
  
-    if len(inputJsons) > 1:
-        for j in range(len(inputJsons)):
-            if matches[j]:
-                data[matches[j]] = jsonRead(inputJsons[j])
-    else:
-        data = jsonRead(inputJsons[0])
+    for j in range(len(inputJsons)):
+        if matches[j]:
+            data[matches[j]] = jsonRead(inputJsons[j])
  
     metrics_file = "~{outputPrefix}_tagReport.json"
     with open(metrics_file, "w") as m:
@@ -359,20 +356,9 @@ Output | Type | Description
  
  ```
  
- Examples of json report for single-lane and multi-lane data:
+ Example of a json report:
  
  ```
- 
- single-lane:
- 
- {
-   "both": "286794",
-   "host": "348954",
-   "neither": "1140",
-   "graft": "5607744"
- }
- 
- multi-lane:
  
  {
    "210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT": {
