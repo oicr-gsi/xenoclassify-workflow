@@ -7,6 +7,8 @@ Xenoclassify 1.3: This Seqware workflow classifies short-read sequencing data ge
 
 ## Overview
 
+This workflow aligns reads to Host and Graft reference genomes, classifies and filters data. There is a built-in support for single- and multi-lane alignment for RNA-seq
+
 ## Dependencies
 
 * [bwa 0.7.12](https://github.com/lh3/bwa/archive/0.7.12.tar.gz)
