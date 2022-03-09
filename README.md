@@ -1,6 +1,6 @@
 # xenoClassify
 
-Xenoclassify 1.2: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).
+Xenoclassify 1.3: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).
 
  ![Xenoclassify, how it works](docs/xenoclassify_wf.png)
 
@@ -27,8 +27,7 @@ java -jar cromwell.jar run xenoclassify.wdl --inputs inputs.json
 #### Required workflow parameters:
 Parameter|Value|Description
 ---|---|---
-`fastqR1`|File|fastq file for read 1
-`fastqR2`|File|fastq file for read 2
+`inputFastqs`|Array[Pair[Pair[File,File],String]]+|Array of fastq files for read 1 and 2 along with rG string
 
 
 #### Optional workflow parameters:
@@ -37,7 +36,6 @@ Parameter|Value|Default|Description
 `refHost`|String|"$MM10_BWA_INDEX_ROOT/mm10.fa"|The reference Host genome to align the sample with by either STAR or BWA
 `refGraft`|String|"$HG19_BWA_INDEX_ROOT/hg19_random.fa"|The reference Graft genome to align the sample with by either STAR or BWA
 `libraryDesign`|String|"WG"|Supported library design acronym. We support WG, EX, TS, WT and MR. Default is WG
-`rG`|String|"'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'"|Read group string
 `alignerModules`|String|"bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"|modules for the aligner sub-workflow
 `outputFileNamePrefix`|String|""|Output file name prefix
 
@@ -105,6 +103,25 @@ Parameter|Value|Default|Description
 `generateGraftBamWG.trimMinQuality`|Int|0|minimum quality of read ends to keep [0]
 `generateGraftBamWG.adapter1`|String|"AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC"|adapter sequence to trim from read 1 [AGATCGGAAGAGCACACGTCTGAACTCCAGTCAC]
 `generateGraftBamWG.adapter2`|String|"AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT"|adapter sequence to trim from read 2 [AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT]
+`sortHostBamWG.jobMemory`|Int|10|Memory allocated to sort task
+`sortHostBamWG.tmpDir`|String?|None|Optionally supply tmpDir for writing chunk bam files for sorting
+`sortHostBamWG.modules`|String|"samtools/1.9"|Names and versions of modules needed for sorting
+`sortHostBamWG.timeout`|Int|72|Timeout for this task in hours
+`sortGraftBamWG.jobMemory`|Int|10|Memory allocated to sort task
+`sortGraftBamWG.tmpDir`|String?|None|Optionally supply tmpDir for writing chunk bam files for sorting
+`sortGraftBamWG.modules`|String|"samtools/1.9"|Names and versions of modules needed for sorting
+`sortGraftBamWG.timeout`|Int|72|Timeout for this task in hours
+`classifyWG.modules`|String|"samtools/1.9 xenoclassify/1.0"|Names and versions of modules needed for classification
+`classifyWG.jobMemory`|Int|10|Memory allocated to classify task
+`classifyWG.neitherThreshold`|Int|20|Threshold for score below which the reads are classified as 'neither'
+`classifyWG.tolerance`|Int|5|Tolerance around the mean of alignment scores for a set of reads classified as 'both'
+`classifyWG.difference`|Int|5|Difference between the sum of host and graft alignment scores for a set of reads classified as 'both'
+`classifyWG.timeout`|Int|72|Timeout for this task in hours
+`filterHostWG.modules`|String|"samtools/1.9"|Names and versions of modules needed for filtering
+`filterHostWG.tmpDir`|String?|None|Optionally supply tmpDir for writing chunk bam files for sorting
+`filterHostWG.filterTags`|Array[String]|["host"]|Filter reads with these tags
+`filterHostWG.jobMemory`|Int|5|Memory allocated to filtering task
+`filterHostWG.timeout`|Int|72|Timeout for this task in hours
 `generateHostBamWT.indexBam_timeout`|Int|48|hours before task timeout
 `generateHostBamWT.indexBam_modules`|String|"picard/2.19.2"|modules for running indexing job
 `generateHostBamWT.indexBam_jobMemory`|Int|12|Memory allocated indexing job
@@ -131,6 +148,10 @@ Parameter|Value|Default|Description
 `generateHostBamWT.runStar_chimericjunctionSuffix`|String|"Chimeric.out"|Suffix for chimeric junction file
 `generateHostBamWT.runStar_transcriptomeSuffix`|String|"Aligned.toTranscriptome.out"|Suffix for transcriptome-aligned file
 `generateHostBamWT.runStar_starSuffix`|String|"Aligned.sortedByCoord.out"|Suffix for sorted file
+`sortHostBamWT.jobMemory`|Int|10|Memory allocated to sort task
+`sortHostBamWT.tmpDir`|String?|None|Optionally supply tmpDir for writing chunk bam files for sorting
+`sortHostBamWT.modules`|String|"samtools/1.9"|Names and versions of modules needed for sorting
+`sortHostBamWT.timeout`|Int|72|Timeout for this task in hours
 `generateGraftBamWT.indexBam_timeout`|Int|48|hours before task timeout
 `generateGraftBamWT.indexBam_modules`|String|"picard/2.19.2"|modules for running indexing job
 `generateGraftBamWT.indexBam_jobMemory`|Int|12|Memory allocated indexing job
@@ -157,25 +178,21 @@ Parameter|Value|Default|Description
 `generateGraftBamWT.runStar_chimericjunctionSuffix`|String|"Chimeric.out"|Suffix for chimeric junction file
 `generateGraftBamWT.runStar_transcriptomeSuffix`|String|"Aligned.toTranscriptome.out"|Suffix for transcriptome-aligned file
 `generateGraftBamWT.runStar_starSuffix`|String|"Aligned.sortedByCoord.out"|Suffix for sorted file
-`sortHostBam.jobMemory`|Int|10|Memory allocated to sort task
-`sortHostBam.tmpDir`|String?|None|Optionally supply tmpDir for writing chunk bam files for sorting
-`sortHostBam.modules`|String|"samtools/1.9"|Names and versions of modules needed for sorting
-`sortHostBam.timeout`|Int|72|Timeout for this task in hours
-`sortGraftBam.jobMemory`|Int|10|Memory allocated to sort task
-`sortGraftBam.tmpDir`|String?|None|Optionally supply tmpDir for writing chunk bam files for sorting
-`sortGraftBam.modules`|String|"samtools/1.9"|Names and versions of modules needed for sorting
-`sortGraftBam.timeout`|Int|72|Timeout for this task in hours
-`classify.modules`|String|"samtools/1.9 xenoclassify/1.0"|Names and versions of modules needed for classification
-`classify.jobMemory`|Int|10|Memory allocated to classify task
-`classify.neitherThreshold`|Int|20|Threshold for score below which the reads are classified as 'neither'
-`classify.tolerance`|Int|5|Tolerance around the mean of alignment scores for a set of reads classified as 'both'
-`classify.difference`|Int|5|Difference between the sum of host and graft alignment scores for a set of reads classified as 'both'
-`classify.timeout`|Int|72|Timeout for this task in hours
-`filterHost.modules`|String|"samtools/1.9"|Names and versions of modules needed for filtering
-`filterHost.tmpDir`|String?|None|Optionally supply tmpDir for writing chunk bam files for sorting
-`filterHost.filterTags`|Array[String]|["host"]|Filter reads with these tags
-`filterHost.jobMemory`|Int|5|Memory allocated to filtering task
-`filterHost.timeout`|Int|72|Timeout for this task in hours
+`sortGraftBamWT.jobMemory`|Int|10|Memory allocated to sort task
+`sortGraftBamWT.tmpDir`|String?|None|Optionally supply tmpDir for writing chunk bam files for sorting
+`sortGraftBamWT.modules`|String|"samtools/1.9"|Names and versions of modules needed for sorting
+`sortGraftBamWT.timeout`|Int|72|Timeout for this task in hours
+`classifyWT.modules`|String|"samtools/1.9 xenoclassify/1.0"|Names and versions of modules needed for classification
+`classifyWT.jobMemory`|Int|10|Memory allocated to classify task
+`classifyWT.neitherThreshold`|Int|20|Threshold for score below which the reads are classified as 'neither'
+`classifyWT.tolerance`|Int|5|Tolerance around the mean of alignment scores for a set of reads classified as 'both'
+`classifyWT.difference`|Int|5|Difference between the sum of host and graft alignment scores for a set of reads classified as 'both'
+`classifyWT.timeout`|Int|72|Timeout for this task in hours
+`filterHostWT.modules`|String|"samtools/1.9"|Names and versions of modules needed for filtering
+`filterHostWT.tmpDir`|String?|None|Optionally supply tmpDir for writing chunk bam files for sorting
+`filterHostWT.filterTags`|Array[String]|["host"]|Filter reads with these tags
+`filterHostWT.jobMemory`|Int|5|Memory allocated to filtering task
+`filterHostWT.timeout`|Int|72|Timeout for this task in hours
 `makeFastq.jobMemory`|Int|24|Memory allocated to the task.
 `makeFastq.overhead`|Int|6|Ovrerhead for calculating heap memory, difference between total and Java-allocated memory
 `makeFastq.timeout`|Int|20|Timeout in hours, needed to override imposed limits.
@@ -207,6 +224,9 @@ Parameter|Value|Default|Description
 `generateFinalBamWT.runStar_chimericjunctionSuffix`|String|"Chimeric.out"|Suffix for chimeric junction file
 `generateFinalBamWT.runStar_transcriptomeSuffix`|String|"Aligned.toTranscriptome.out"|Suffix for transcriptome-aligned file
 `generateFinalBamWT.runStar_starSuffix`|String|"Aligned.sortedByCoord.out"|Suffix for sorted file
+`mergeReports.modules`|String|""|Environment modules for the task
+`mergeReports.jobMemory`|Int|4|Memory for the task, in gigabytes
+`mergeReports.timeout`|Int|4|Timeout for the task, in hours
 
 
 ### Outputs
@@ -227,7 +247,8 @@ Output | Type | Description
  
  * Running Xenoclassify workflow
  
- Xenoclassify aligns data to host and graft genomes using imported bwaMem workflow and then classify reads depending on their alignment scores.
+ Xenoclassify aligns data to host and graft genomes using imported bwaMem (or star) workflow and then classify reads depending on their alignment scores.
+ In the case of STAR we support multi-lane data. WG/EX/TS data are going to be aligned as single-lane data only.
  
  Sort bam files by read name
  
@@ -299,8 +320,73 @@ Output | Type | Description
  ```
  
  In addition, we run second pass STAR alignments with reads from the filtered bam extracted into fastq
-
-## Support
+ 
+ 
+ Merging reports - this is needed only for multi-lane transcriptome data processing
+ For multi-lane data we also add lane identificators
+ 
+ ```
+    import json
+    import re
+ 
+    r = "~{sep=' ' inputReports}"
+    inputJsons = r.split()
+    inputRgs = "~{sep=' ' inputRgs}"
+ 
+    data = {}
+ 
+    def jsonRead(fileName):
+        with open(fileName, "r") as f:
+            jsonText = f.readlines()
+            jsonText = "".join(jsonText)
+            jsonText = jsonText.strip()
+        return json.loads(jsonText)
+ 
+    matches = re.findall('(?<=[ID]:)([\S]*)', inputRgs)
+ 
+    if len(inputJsons) > 1:
+        for j in range(len(inputJsons)):
+            if matches[j]:
+                data[matches[j]] = jsonRead(inputJsons[j])
+    else:
+        data = jsonRead(inputJsons[0])
+ 
+    metrics_file = "~{outputPrefix}_tagReport.json"
+    with open(metrics_file, "w") as m:
+        m.write(json.dumps(data, indent=2))
+ 
+ ```
+ 
+ Examples of json report for single-lane and multi-lane data:
+ 
+ ```
+ 
+ single-lane:
+ 
+ {
+   "both": "286794",
+   "host": "348954",
+   "neither": "1140",
+   "graft": "5607744"
+ }
+ 
+ multi-lane:
+ 
+ {
+   "210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT": {
+     "both": "13188",
+     "host": "5184",
+     "graft": "233018"
+   },
+   "210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT": {
+     "both": "11904",
+     "host": "5076",
+     "graft": "217000"
+   }
+ }
+ 
+ ```
+ ## Support
 
 For support, please file an issue on the [Github project](https://github.com/oicr-gsi) or send an email to gsi@oicr.on.ca .
 

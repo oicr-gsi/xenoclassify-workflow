@@ -6,19 +6,21 @@ import "imports/pull_star.wdl" as star
 
 workflow xenoClassify {
 input {
-        File fastqR1
-	File fastqR2
-	String refHost    = "$MM10_BWA_INDEX_ROOT/mm10.fa"
-	String refGraft   = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
-        String libraryDesign = "WG"
-        String rG = "'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'"
-        String alignerModules = "bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
-        String outputFileNamePrefix = ""
+  Array[Pair[Pair[File, File], String]]+ inputFastqs
+  String refHost    = "$MM10_BWA_INDEX_ROOT/mm10.fa"
+  String refGraft   = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
+  String libraryDesign = "WG"
+  String alignerModules = "bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
+  String outputFileNamePrefix = ""
 }
 
-String outputPrefix = if outputFileNamePrefix=="" then basename(fastqR1, '.fastq.gz') else outputFileNamePrefix
+String outputPrefix = outputFileNamePrefix
+File fastqR1 = inputFastqs[0].left.left
+File fastqR2 = inputFastqs[0].left.right
+String rG = inputFastqs[0].right
 
 if (libraryDesign == "WG" || libraryDesign == "EX" || libraryDesign == "TS") {
+ 
  call bwaMem.bwaMem as generateHostBamWG {
    input:
      fastqR1 = fastqR1, 
@@ -38,63 +40,60 @@ if (libraryDesign == "WG" || libraryDesign == "EX" || libraryDesign == "TS") {
      readGroups = rG,
      outputFileNamePrefix = "graft"
  }
+ call sortBam as sortHostBamWG { input: inBam = select_first([generateHostBamWG.bwaMemBam, generateHostBamWT.starBam]) }
+ call sortBam as sortGraftBamWG { input: inBam = select_first([generateGraftBamWG.bwaMemBam, generateGraftBamWT.starBam]) }
+ call classify as classifyWG { input: hostBam = sortHostBamWG.sortedBam, graftBam = sortGraftBamWG.sortedBam, outputPrefix = outputFileNamePrefix }
+ call filterHost as filterHostWG { input: xenoClassifyBam = classifyWG.xenoClassifyBam, outputPrefix = outputFileNamePrefix }
 } 
 
 if (libraryDesign == "WT" || libraryDesign == "MR") {
-  Array[Pair[Pair[File, File], String]] inputFastqs = [((fastqR1, fastqR2), rG)]
-  call star.star as generateHostBamWT {
-    input:
-      inputFqsRgs = inputFastqs,
-      runStar_genomeIndexDir = refHost,
-      runStar_modules = alignerModules,
-      outputFileNamePrefix = "host"
+  scatter(fq in inputFastqs) {
+    call star.star as generateHostBamWT {
+      input:
+        inputFqsRgs = [fq],
+        runStar_genomeIndexDir = refHost,
+        runStar_modules = alignerModules,
+        outputFileNamePrefix = "host"
+    }
+    call sortBam as sortHostBamWT { input: inBam = generateHostBamWT.starBam }
+    call star.star as generateGraftBamWT {
+      input:
+        inputFqsRgs = [fq],
+        runStar_genomeIndexDir = refGraft,
+        runStar_modules = alignerModules,
+        outputFileNamePrefix = "graft"
+    }
+    call sortBam as sortGraftBamWT { input: inBam = generateGraftBamWT.starBam }
+    
+    call classify as classifyWT { input: hostBam = sortHostBamWT.sortedBam, graftBam = sortGraftBamWT.sortedBam, outputPrefix = outputFileNamePrefix }
+    call filterHost as filterHostWT { input: xenoClassifyBam = classifyWT.xenoClassifyBam, outputPrefix = outputFileNamePrefix }
+    call makeFastq { input: inputBam = filterHostWT.outputBam, rG = fq.right, outputPrefix = outputFileNamePrefix }
   }
-
-  call star.star as generateGraftBamWT {
-    input:
-      inputFqsRgs = inputFastqs,
-      runStar_genomeIndexDir = refGraft,
-      runStar_modules = alignerModules,
-      outputFileNamePrefix = outputFileNamePrefix
-  }
-}
-  
-
-call sortBam as sortHostBam { input: inBam = select_first([generateHostBamWG.bwaMemBam, generateHostBamWT.starBam]) }
-call sortBam as sortGraftBam { input: inBam = select_first([generateGraftBamWG.bwaMemBam, generateGraftBamWT.starBam]) }
-
-call classify { input: hostBam = sortHostBam.sortedBam, graftBam = sortGraftBam.sortedBam, outputPrefix = outputPrefix }
-call filterHost { input: xenoClassifyBam = classify.xenoClassifyBam, outputPrefix = outputPrefix }
-
-if (libraryDesign == "WT" || libraryDesign == "MR") {
-
-  call makeFastq { input: inputBam = filterHost.outputBam, outputPrefix = outputPrefix } 
-  Array[Pair[Pair[File, File], String]] filteredFastqs = [((makeFastq.filteredF1, makeFastq.filteredF2), rG)]
+  # Also, re-align filtered data with star and merge reports from the classify task
   call star.star as generateFinalBamWT {
     input:
-      inputFqsRgs = filteredFastqs,
+      inputFqsRgs = makeFastq.fastqData,
       runStar_genomeIndexDir = refGraft,
       runStar_modules = alignerModules,
       outputFileNamePrefix = outputFileNamePrefix
   }
+  call mergeReports { input: inputReports = classifyWT.jsonReport, inputRgs = makeFastq.readGroup, outputPrefix = outputFileNamePrefix }
 }
-
+  
 output {
-  File filteredResults = select_first([generateFinalBamWT.starBam, filterHost.outputBam]) 
-  File filteredResultsIndex = select_first([generateFinalBamWT.starIndex, filterHost.outputBai])
+  File filteredResults = select_first([generateFinalBamWT.starBam, filterHostWG.outputBam]) 
+  File filteredResultsIndex = select_first([generateFinalBamWT.starIndex, filterHostWG.outputBai])
   File? starChimeric = generateFinalBamWT.starChimeric
   File? transcriptomeBam = generateFinalBamWT.transcriptomeBam
   File? geneReadFile = generateFinalBamWT.geneReadFile
-  File jsonReport = classify.jsonReport
+  File jsonReport = select_first([mergeReports.jsonReport, classifyWG.jsonReport])
 }
 
 parameter_meta {
-  fastqR1: "fastq file for read 1"
-  fastqR2: "fastq file for read 2"
+  inputFastqs: "Array of fastq files for read 1 and 2 along with rG string"
   libraryDesign: "Supported library design acronym. We support WG, EX, TS, WT and MR. Default is WG"
   refHost: "The reference Host genome to align the sample with by either STAR or BWA"
   refGraft: "The reference Graft genome to align the sample with by either STAR or BWA"
-  rG: "Read group string"
   alignerModules: "modules for the aligner sub-workflow"
   outputFileNamePrefix: "Output file name prefix"
 }
@@ -103,7 +102,7 @@ parameter_meta {
 meta {
   author: "Peter Ruzanov"
   email: "peter.ruzanov@oicr.on.ca"
-  description: "Xenoclassify 1.0: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).\n\n ![Xenoclassify, how it works](docs/xenoclassify_wf.png)\n"
+  description: "Xenoclassify 1.3: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).\n\n ![Xenoclassify, how it works](docs/xenoclassify_wf.png)\n"
   dependencies: [
     {
       name: "bwa/0.7.12",
@@ -302,6 +301,7 @@ input {
   Int timeout = 20
   File inputBam
   String outputPrefix
+  String rG
   String picardParams = "VALIDATION_STRINGENCY=LENIENT"
   String modules = "samtools/1.9 picard/2.21.2"
 }
@@ -321,6 +321,7 @@ parameter_meta {
  inputBam: "Input bam file, BWA-aligned reads"
  outputPrefix: "Output prefix for the result file"
  jobMemory: "Memory allocated to the task."
+ rG: "Read group string for passing to the downstream process"
  overhead: "Ovrerhead for calculating heap memory, difference between total and Java-allocated memory"
  picardParams: "Additional parameters for picard SamToFastq, Default is VALIDATION_STRINGENCY=LENIENT"
  modules: "Names and versions of required modules."
@@ -334,7 +335,76 @@ runtime {
 }
 
 output {
-  File filteredF1 = "~{outputPrefix}_part_1.fastq.gz"
-  File filteredF2 = "~{outputPrefix}_part_2.fastq.gz"
+  Pair[Pair[File,File], String] fastqData = (("~{outputPrefix}_part_1.fastq.gz", "~{outputPrefix}_part_2.fastq.gz"), "~{rG}")
+  String readGroup = "~{rG}"
 }
 }
+
+# =========================================
+#   Optional for WT: Merge classify reports
+# =========================================
+task mergeReports {
+  input {
+    Array[File] inputReports
+    Array[String] inputRgs
+    String outputPrefix
+    String modules = ""
+    Int jobMemory = 4
+    Int timeout = 4
+  }
+
+  parameter_meta {
+    inputReports: "Array of input JSON files"
+    inputRgs: "Array of RG strings"
+    outputPrefix: "Output prefix for the result file"
+    jobMemory: "Memory for the task, in gigabytes"
+    modules: "Environment modules for the task"
+    timeout: "Timeout for the task, in hours"
+  }
+
+ command <<<
+   python <<CODE
+   import json
+   import re
+
+   r = "~{sep=' ' inputReports}"
+   inputJsons = r.split()
+   inputRgs = "~{sep=' ' inputRgs}"
+   
+   data = {}
+
+   def jsonRead(fileName):
+       with open(fileName, "r") as f:
+           jsonText = f.readlines()
+           jsonText = "".join(jsonText)
+           jsonText = jsonText.strip()
+       return json.loads(jsonText)
+
+   matches = re.findall('(?<=[ID]:)([\S]*)', inputRgs)
+
+   if len(inputJsons) > 1:
+       for j in range(len(inputJsons)):
+           if matches[j]:
+               data[matches[j]] = jsonRead(inputJsons[j])
+   else:
+       data = jsonRead(inputJsons[0])
+
+   metrics_file = "~{outputPrefix}_tagReport.json"
+   with open(metrics_file, "w") as m:
+       m.write(json.dumps(data, indent=2))
+ 
+   CODE
+  >>>
+
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
+
+  output {
+    File jsonReport = "~{outputPrefix}_tagReport.json"
+  }
+}
+
+
