@@ -7,6 +7,8 @@ Xenoclassify 1.3: This Seqware workflow classifies short-read sequencing data ge
 
 ## Overview
 
+This workflow aligns reads to Host and Graft reference genomes, classifies and filters data. There is a built-in support for single- and multi-lane alignment for RNA-seq
+
 ## Dependencies
 
 * [bwa 0.7.12](https://github.com/lh3/bwa/archive/0.7.12.tar.gz)
@@ -344,12 +346,9 @@ Output | Type | Description
  
     matches = re.findall('(?<=[ID]:)([\S]*)', inputRgs)
  
-    if len(inputJsons) > 1:
-        for j in range(len(inputJsons)):
-            if matches[j]:
-                data[matches[j]] = jsonRead(inputJsons[j])
-    else:
-        data = jsonRead(inputJsons[0])
+    for j in range(len(inputJsons)):
+        if matches[j]:
+            data[matches[j]] = jsonRead(inputJsons[j])
  
     metrics_file = "~{outputPrefix}_tagReport.json"
     with open(metrics_file, "w") as m:
@@ -357,20 +356,9 @@ Output | Type | Description
  
  ```
  
- Examples of json report for single-lane and multi-lane data:
+ Example of a json report:
  
  ```
- 
- single-lane:
- 
- {
-   "both": "286794",
-   "host": "348954",
-   "neither": "1140",
-   "graft": "5607744"
- }
- 
- multi-lane:
  
  {
    "210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT": {

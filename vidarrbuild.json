@@ -1,6 +1,7 @@
 {
     "names": [
-        "xenoclassify"
+        "xenoclassify_call_ready",
+        "xenoclassify_lane_level"
     ],
     "wdl": "xenoclassify.wdl"
 }

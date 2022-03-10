@@ -6,7 +6,7 @@ set -o pipefail
 # For bam file we do the md5sum
 module load samtools/1.9
 # For json file we do the md5sum
-find . -name *.json | xargs md5sum
+find . -name '*.json' | xargs md5sum
 JUNCTIONS="./Xenoclassify.Chimeric.out.junction"
 # Optional files from STAR
 if [[ -f $JUNCTIONS ]];then

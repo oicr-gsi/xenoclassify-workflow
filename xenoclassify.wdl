@@ -44,6 +44,7 @@ if (libraryDesign == "WG" || libraryDesign == "EX" || libraryDesign == "TS") {
  call sortBam as sortGraftBamWG { input: inBam = select_first([generateGraftBamWG.bwaMemBam, generateGraftBamWT.starBam]) }
  call classify as classifyWG { input: hostBam = sortHostBamWG.sortedBam, graftBam = sortGraftBamWG.sortedBam, outputPrefix = outputFileNamePrefix }
  call filterHost as filterHostWG { input: xenoClassifyBam = classifyWG.xenoClassifyBam, outputPrefix = outputFileNamePrefix }
+ call mergeReports as mergeReportsWG { input: inputReports = [classifyWG.jsonReport], inputRgs = [rG], outputPrefix = outputFileNamePrefix }
 } 
 
 if (libraryDesign == "WT" || libraryDesign == "MR") {
@@ -77,16 +78,16 @@ if (libraryDesign == "WT" || libraryDesign == "MR") {
       runStar_modules = alignerModules,
       outputFileNamePrefix = outputFileNamePrefix
   }
-  call mergeReports { input: inputReports = classifyWT.jsonReport, inputRgs = makeFastq.readGroup, outputPrefix = outputFileNamePrefix }
+  call mergeReports as mergeReportsWT { input: inputReports = classifyWT.jsonReport, inputRgs = makeFastq.readGroup, outputPrefix = outputFileNamePrefix }
 }
-  
+
 output {
   File filteredResults = select_first([generateFinalBamWT.starBam, filterHostWG.outputBam]) 
   File filteredResultsIndex = select_first([generateFinalBamWT.starIndex, filterHostWG.outputBai])
   File? starChimeric = generateFinalBamWT.starChimeric
   File? transcriptomeBam = generateFinalBamWT.transcriptomeBam
   File? geneReadFile = generateFinalBamWT.geneReadFile
-  File jsonReport = select_first([mergeReports.jsonReport, classifyWG.jsonReport])
+  File jsonReport = select_first([mergeReportsWT.jsonReport, mergeReportsWG.jsonReport])
 }
 
 parameter_meta {
@@ -382,12 +383,9 @@ task mergeReports {
 
    matches = re.findall('(?<=[ID]:)([\S]*)', inputRgs)
 
-   if len(inputJsons) > 1:
-       for j in range(len(inputJsons)):
-           if matches[j]:
-               data[matches[j]] = jsonRead(inputJsons[j])
-   else:
-       data = jsonRead(inputJsons[0])
+   for j in range(len(inputJsons)):
+       if matches[j]:
+           data[matches[j]] = jsonRead(inputJsons[j])
 
    metrics_file = "~{outputPrefix}_tagReport.json"
    with open(metrics_file, "w") as m:
