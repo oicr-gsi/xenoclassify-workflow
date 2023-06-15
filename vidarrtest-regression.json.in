@@ -2,7 +2,7 @@
     {
         "arguments": {
             "xenoClassify.libraryDesign": "WG",
-            "xenoClassify.alignerModules": null,
+            "xenoClassify.reference": "hg19",
             "xenoClassify.classifyWG.difference": null,
             "xenoClassify.classifyWG.jobMemory": null,
             "xenoClassify.classifyWG.modules": null,
@@ -212,8 +212,6 @@
             "xenoClassify.mergeReportsWT.jobMemory": null,
             "xenoClassify.mergeReportsWG.jobMemory": null,
             "xenoClassify.outputFileNamePrefix": "Xenoclassify",
-            "xenoClassify.refGraft": "$HG19_BWA_INDEX_ROOT/hg19_random.fa",
-            "xenoClassify.refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
             "xenoClassify.sortGraftBamWG.jobMemory": null,
             "xenoClassify.sortGraftBamWG.modules": null,
             "xenoClassify.sortGraftBamWG.timeout": null,
@@ -299,7 +297,7 @@
     {
         "arguments": {
             "xenoClassify.libraryDesign": "WT",
-            "xenoClassify.alignerModules": "samtools/1.9 mm10-star-index100/2.6.0c hg19-star-index100/2.6.0c",
+            "xenoClassify.reference": "hg19",
             "xenoClassify.classifyWG.difference": null,
             "xenoClassify.classifyWG.jobMemory": null,
             "xenoClassify.classifyWG.modules": null,
@@ -509,8 +507,6 @@
             "xenoClassify.mergeReportsWT.jobMemory": null,
             "xenoClassify.mergeReportsWG.jobMemory": null,
             "xenoClassify.outputFileNamePrefix": "Xenoclassify",
-            "xenoClassify.refGraft": "$HG19_STAR_INDEX100_ROOT/",
-            "xenoClassify.refHost":  "$MM10_STAR_INDEX100_ROOT/",
             "xenoClassify.sortGraftBamWG.jobMemory": null,
             "xenoClassify.sortGraftBamWG.modules": null,
             "xenoClassify.sortGraftBamWG.timeout": null,
@@ -596,7 +592,7 @@
     {
         "arguments": {
             "xenoClassify.libraryDesign": "WT",
-            "xenoClassify.alignerModules": "mm10-star-index100/2.7.6a hg38-star-index100/2.7.6a samtools/1.9",
+            "xenoClassify.reference": "hg38",
             "xenoClassify.classifyWG.difference": null,
             "xenoClassify.classifyWG.jobMemory": null,
             "xenoClassify.classifyWG.modules": null,
@@ -836,8 +832,6 @@
             "xenoClassify.mergeReportsWT.jobMemory": null,
             "xenoClassify.mergeReportsWG.jobMemory": null,
             "xenoClassify.outputFileNamePrefix": "Xenoclassify",
-            "xenoClassify.refGraft": "$HG38_STAR_INDEX100_ROOT/",
-            "xenoClassify.refHost":  "$MM10_STAR_INDEX100_ROOT/",
             "xenoClassify.sortGraftBamWG.jobMemory": null,
             "xenoClassify.sortGraftBamWG.modules": null,
             "xenoClassify.sortGraftBamWG.timeout": null,
