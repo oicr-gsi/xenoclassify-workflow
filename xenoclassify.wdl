@@ -23,12 +23,12 @@ Map[String,alignmentResources] resourcesWG = {
     "hg38": {
       "refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
       "refGraft": "$HG38_BWA_INDEX_ROOT/hg38_random.fa",
-      "modules": "bwa/0.7.17 hg38-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
+      "modules": "samtools/1.9 bwa/0.7.17 hg38-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
     },
     "hg19": {
       "refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
       "refGraft": "$HG19_BWA_INDEX_ROOT/hg19_random.fa",
-      "modules": "bwa/0.7.17 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
+      "modules": "samtools/1.9 bwa/0.7.17 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
     }
 }
 
