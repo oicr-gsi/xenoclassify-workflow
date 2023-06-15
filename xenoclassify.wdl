@@ -41,7 +41,7 @@ Map[String,alignmentResources] resourcesWT = {
     "hg19": {
       "refHost": "$MM10_STAR_INDEX100_ROOT/",
       "refGraft": "$HG19_STAR_INDEX100_ROOT/",
-      "modules": "bwa/0.7.17 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
+      "modules": "mm10-star-index100/2.6.0c hg19-star-index100/2.6.0c"
     }
 }
 
