@@ -1,3 +1,5 @@
+## 1.4.0 - 2022-06-15
+ - assembly-specific modules are specified inside the workflow
 ## 1.3.0 - 2022-03-08
  - multi-lane STAR support for WT/MR data, some re-design of the workflow
 ## 1.2.1 - 2022-02-08

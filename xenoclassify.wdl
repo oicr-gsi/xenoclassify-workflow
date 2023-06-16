@@ -4,14 +4,45 @@ version 1.0
 import "imports/bwaMem.wdl" as bwaMem
 import "imports/pull_star.wdl" as star
 
+struct alignmentResources {
+    String refHost
+    String refGraft
+    String modules
+}
+
+
 workflow xenoClassify {
 input {
   Array[Pair[Pair[File, File], String]]+ inputFastqs
-  String refHost    = "$MM10_BWA_INDEX_ROOT/mm10.fa"
-  String refGraft   = "$HG19_BWA_INDEX_ROOT/hg19_random.fa"
-  String libraryDesign = "WG"
-  String alignerModules = "bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
+  String reference
+  String libraryDesign
   String outputFileNamePrefix = ""
+}
+
+Map[String,alignmentResources] resourcesWG = {
+    "hg38": {
+      "refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
+      "refGraft": "$HG38_BWA_INDEX_ROOT/hg38_random.fa",
+      "modules": "samtools/1.9 bwa/0.7.17 hg38-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
+    },
+    "hg19": {
+      "refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
+      "refGraft": "$HG19_BWA_INDEX_ROOT/hg19_random.fa",
+      "modules": "samtools/1.9 bwa/0.7.17 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
+    }
+}
+
+Map[String,alignmentResources] resourcesWT = {
+    "hg38": {
+      "refHost": "$MM10_STAR_INDEX100_ROOT/",
+      "refGraft": "$HG38_STAR_INDEX100_ROOT/",
+      "modules": "mm10-star-index100/2.7.6a hg38-star-index100/2.7.6a"
+    },
+    "hg19": {
+      "refHost": "$MM10_STAR_INDEX100_ROOT/",
+      "refGraft": "$HG19_STAR_INDEX100_ROOT/",
+      "modules": "mm10-star-index100/2.6.0c hg19-star-index100/2.6.0c"
+    }
 }
 
 String outputPrefix = outputFileNamePrefix
@@ -25,8 +56,8 @@ if (libraryDesign == "WG" || libraryDesign == "EX" || libraryDesign == "TS") {
    input:
      fastqR1 = fastqR1, 
      fastqR2 = fastqR2, 
-     runBwaMem_bwaRef = refHost, 
-     runBwaMem_modules = alignerModules,
+     runBwaMem_bwaRef = resourcesWG[reference].refHost,
+     runBwaMem_modules = resourcesWG[reference].modules,
      readGroups = rG,
      outputFileNamePrefix = "host"
  }
@@ -35,8 +66,8 @@ if (libraryDesign == "WG" || libraryDesign == "EX" || libraryDesign == "TS") {
    input:
      fastqR1 = fastqR1,
      fastqR2 = fastqR2,
-     runBwaMem_bwaRef = refGraft,
-     runBwaMem_modules = alignerModules,
+     runBwaMem_bwaRef = resourcesWG[reference].refGraft,
+     runBwaMem_modules = resourcesWG[reference].modules,
      readGroups = rG,
      outputFileNamePrefix = "graft"
  }
@@ -52,16 +83,16 @@ if (libraryDesign == "WT" || libraryDesign == "MR") {
     call star.star as generateHostBamWT {
       input:
         inputFqsRgs = [fq],
-        runStar_genomeIndexDir = refHost,
-        runStar_modules = alignerModules,
+        runStar_genomeIndexDir = resourcesWT[reference].refHost,
+        runStar_modules = resourcesWT[reference].modules,
         outputFileNamePrefix = "host"
     }
     call sortBam as sortHostBamWT { input: inBam = generateHostBamWT.starBam }
     call star.star as generateGraftBamWT {
       input:
         inputFqsRgs = [fq],
-        runStar_genomeIndexDir = refGraft,
-        runStar_modules = alignerModules,
+        runStar_genomeIndexDir = resourcesWT[reference].refGraft,
+        runStar_modules = resourcesWT[reference].modules,
         outputFileNamePrefix = "graft"
     }
     call sortBam as sortGraftBamWT { input: inBam = generateGraftBamWT.starBam }
@@ -74,8 +105,8 @@ if (libraryDesign == "WT" || libraryDesign == "MR") {
   call star.star as generateFinalBamWT {
     input:
       inputFqsRgs = makeFastq.fastqData,
-      runStar_genomeIndexDir = refGraft,
-      runStar_modules = alignerModules,
+      runStar_genomeIndexDir = resourcesWT[reference].refGraft,
+      runStar_modules = resourcesWT[reference].modules,
       outputFileNamePrefix = outputFileNamePrefix
   }
   call mergeReports as mergeReportsWT { input: inputReports = classifyWT.jsonReport, inputRgs = makeFastq.readGroup, outputPrefix = outputFileNamePrefix }
@@ -93,9 +124,7 @@ output {
 parameter_meta {
   inputFastqs: "Array of fastq files for read 1 and 2 along with rG string"
   libraryDesign: "Supported library design acronym. We support WG, EX, TS, WT and MR. Default is WG"
-  refHost: "The reference Host genome to align the sample with by either STAR or BWA"
-  refGraft: "The reference Graft genome to align the sample with by either STAR or BWA"
-  alignerModules: "modules for the aligner sub-workflow"
+  reference: "The reference of Graft to align the data with by either STAR or BWA"
   outputFileNamePrefix: "Output file name prefix"
 }
 

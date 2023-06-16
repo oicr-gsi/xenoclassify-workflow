@@ -30,15 +30,13 @@ java -jar cromwell.jar run xenoclassify.wdl --inputs inputs.json
 Parameter|Value|Description
 ---|---|---
 `inputFastqs`|Array[Pair[Pair[File,File],String]]+|Array of fastq files for read 1 and 2 along with rG string
+`reference`|String|The reference of Graft to align the data with by either STAR or BWA
+`libraryDesign`|String|Supported library design acronym. We support WG, EX, TS, WT and MR. Default is WG
 
 
 #### Optional workflow parameters:
 Parameter|Value|Default|Description
 ---|---|---|---
-`refHost`|String|"$MM10_BWA_INDEX_ROOT/mm10.fa"|The reference Host genome to align the sample with by either STAR or BWA
-`refGraft`|String|"$HG19_BWA_INDEX_ROOT/hg19_random.fa"|The reference Graft genome to align the sample with by either STAR or BWA
-`libraryDesign`|String|"WG"|Supported library design acronym. We support WG, EX, TS, WT and MR. Default is WG
-`alignerModules`|String|"bwa/0.7.17 samtools/1.9 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"|modules for the aligner sub-workflow
 `outputFileNamePrefix`|String|""|Output file name prefix
 
 
@@ -124,6 +122,9 @@ Parameter|Value|Default|Description
 `filterHostWG.filterTags`|Array[String]|["host"]|Filter reads with these tags
 `filterHostWG.jobMemory`|Int|5|Memory allocated to filtering task
 `filterHostWG.timeout`|Int|72|Timeout for this task in hours
+`mergeReportsWG.modules`|String|""|Environment modules for the task
+`mergeReportsWG.jobMemory`|Int|4|Memory for the task, in gigabytes
+`mergeReportsWG.timeout`|Int|4|Timeout for the task, in hours
 `generateHostBamWT.indexBam_timeout`|Int|48|hours before task timeout
 `generateHostBamWT.indexBam_modules`|String|"picard/2.19.2"|modules for running indexing job
 `generateHostBamWT.indexBam_jobMemory`|Int|12|Memory allocated indexing job
@@ -226,9 +227,9 @@ Parameter|Value|Default|Description
 `generateFinalBamWT.runStar_chimericjunctionSuffix`|String|"Chimeric.out"|Suffix for chimeric junction file
 `generateFinalBamWT.runStar_transcriptomeSuffix`|String|"Aligned.toTranscriptome.out"|Suffix for transcriptome-aligned file
 `generateFinalBamWT.runStar_starSuffix`|String|"Aligned.sortedByCoord.out"|Suffix for sorted file
-`mergeReports.modules`|String|""|Environment modules for the task
-`mergeReports.jobMemory`|Int|4|Memory for the task, in gigabytes
-`mergeReports.timeout`|Int|4|Timeout for the task, in hours
+`mergeReportsWT.modules`|String|""|Environment modules for the task
+`mergeReportsWT.jobMemory`|Int|4|Memory for the task, in gigabytes
+`mergeReportsWT.timeout`|Int|4|Timeout for the task, in hours
 
 
 ### Outputs
@@ -346,9 +347,12 @@ Output | Type | Description
  
     matches = re.findall('(?<=[ID]:)([\S]*)', inputRgs)
  
-    for j in range(len(inputJsons)):
-        if matches[j]:
-            data[matches[j]] = jsonRead(inputJsons[j])
+    if len(inputJsons) > 1:
+        for j in range(len(inputJsons)):
+            if matches[j]:
+                data[matches[j]] = jsonRead(inputJsons[j])
+    else:
+        data = jsonRead(inputJsons[0])
  
     metrics_file = "~{outputPrefix}_tagReport.json"
     with open(metrics_file, "w") as m:
@@ -359,6 +363,17 @@ Output | Type | Description
  Example of a json report:
  
  ```
+ 
+ single-lane:
+ 
+ {
+   "both": "286794",
+   "host": "348954",
+   "neither": "1140",
+   "graft": "5607744"
+ }
+ 
+ multi-lane:
  
  {
    "210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT": {
