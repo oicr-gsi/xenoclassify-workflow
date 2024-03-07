@@ -1,112 +1,81 @@
 version 1.0
 
 # imports workflows for the top portion of WGSPipeline
-import "imports/bwaMem.wdl" as bwaMem
+import "imports/pull_bwamem2.wdl" as bwaMem
 import "imports/pull_star.wdl" as star
 
-struct alignmentResources {
-    String refHost
-    String refGraft
-    String modules
+struct InputGroup {
+  File fastqR1
+  File fastqR2
+  String readGroup
 }
-
 
 workflow xenoClassify {
 input {
-  Array[Pair[Pair[File, File], String]]+ inputFastqs
+  Array[InputGroup] inputs
   String reference
   String libraryDesign
   String outputFileNamePrefix = ""
 }
 
-Map[String,alignmentResources] resourcesWG = {
-    "hg38": {
-      "refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
-      "refGraft": "$HG38_BWA_INDEX_ROOT/hg38_random.fa",
-      "modules": "samtools/1.9 bwa/0.7.17 hg38-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
-    },
-    "hg19": {
-      "refHost": "$MM10_BWA_INDEX_ROOT/mm10.fa",
-      "refGraft": "$HG19_BWA_INDEX_ROOT/hg19_random.fa",
-      "modules": "samtools/1.9 bwa/0.7.17 hg19-bwa-index/0.7.17 mm10-bwa-index/0.7.17"
-    }
-}
-
-Map[String,alignmentResources] resourcesWT = {
-    "hg38": {
-      "refHost": "$MM10_STAR_INDEX100_ROOT/",
-      "refGraft": "$HG38_STAR_INDEX100_ROOT/",
-      "modules": "mm10-star-index100/2.7.6a hg38-star-index100/2.7.6a"
-    },
-    "hg19": {
-      "refHost": "$MM10_STAR_INDEX100_ROOT/",
-      "refGraft": "$HG19_STAR_INDEX100_ROOT/",
-      "modules": "mm10-star-index100/2.6.0c hg19-star-index100/2.6.0c"
-    }
-}
-
 String outputPrefix = outputFileNamePrefix
-File fastqR1 = inputFastqs[0].left.left
-File fastqR2 = inputFastqs[0].left.right
-String rG = inputFastqs[0].right
+# We support only single-lane data for WG
+File fastqR1 = select_first(inputs).fastqR1
+File fastqR2 = select_first(inputs).fastqR2
+String rG = select_first(inputs).readGroup
 
 if (libraryDesign == "WG" || libraryDesign == "EX" || libraryDesign == "TS") {
- 
- call bwaMem.bwaMem as generateHostBamWG {
+
+ call bwaMem.bwamem2 as generateHostBamWG {
    input:
      fastqR1 = fastqR1, 
      fastqR2 = fastqR2, 
-     runBwaMem_bwaRef = resourcesWG[reference].refHost,
-     runBwaMem_modules = resourcesWG[reference].modules,
-     readGroups = rG,
+     runBwamem2_readGroups = rG,
+     reference = "mm10",
      outputFileNamePrefix = "host"
  }
 
- call bwaMem.bwaMem as generateGraftBamWG {
+ call bwaMem.bwamem2 as generateGraftBamWG {
    input:
      fastqR1 = fastqR1,
      fastqR2 = fastqR2,
-     runBwaMem_bwaRef = resourcesWG[reference].refGraft,
-     runBwaMem_modules = resourcesWG[reference].modules,
-     readGroups = rG,
+     runBwamem2_readGroups = rG,
+     reference = reference,
      outputFileNamePrefix = "graft"
  }
- call sortBam as sortHostBamWG { input: inBam = select_first([generateHostBamWG.bwaMemBam, generateHostBamWT.starBam]) }
- call sortBam as sortGraftBamWG { input: inBam = select_first([generateGraftBamWG.bwaMemBam, generateGraftBamWT.starBam]) }
+ call sortBam as sortHostBamWG { input: inBam = select_first([generateHostBamWG.bwamem2Bam, generateHostBamWT.starBam]) }
+ call sortBam as sortGraftBamWG { input: inBam = select_first([generateGraftBamWG.bwamem2Bam, generateGraftBamWT.starBam]) }
  call classify as classifyWG { input: hostBam = sortHostBamWG.sortedBam, graftBam = sortGraftBamWG.sortedBam, outputPrefix = outputFileNamePrefix }
  call filterHost as filterHostWG { input: xenoClassifyBam = classifyWG.xenoClassifyBam, outputPrefix = outputFileNamePrefix }
  call mergeReports as mergeReportsWG { input: inputReports = [classifyWG.jsonReport], inputRgs = [rG], outputPrefix = outputFileNamePrefix }
 } 
 
 if (libraryDesign == "WT" || libraryDesign == "MR") {
-  scatter(fq in inputFastqs) {
+  scatter(inp in inputs) {
     call star.star as generateHostBamWT {
       input:
-        inputFqsRgs = [fq],
-        runStar_genomeIndexDir = resourcesWT[reference].refHost,
-        runStar_modules = resourcesWT[reference].modules,
+        inputGroups = [inp],
+        reference = "mm10",
         outputFileNamePrefix = "host"
     }
     call sortBam as sortHostBamWT { input: inBam = generateHostBamWT.starBam }
     call star.star as generateGraftBamWT {
       input:
-        inputFqsRgs = [fq],
-        runStar_genomeIndexDir = resourcesWT[reference].refGraft,
-        runStar_modules = resourcesWT[reference].modules,
+        inputGroups = [inp],
+        reference = reference,
         outputFileNamePrefix = "graft"
     }
     call sortBam as sortGraftBamWT { input: inBam = generateGraftBamWT.starBam }
     
     call classify as classifyWT { input: hostBam = sortHostBamWT.sortedBam, graftBam = sortGraftBamWT.sortedBam, outputPrefix = outputFileNamePrefix }
     call filterHost as filterHostWT { input: xenoClassifyBam = classifyWT.xenoClassifyBam, outputPrefix = outputFileNamePrefix }
-    call makeFastq { input: inputBam = filterHostWT.outputBam, rG = fq.right, outputPrefix = outputFileNamePrefix }
+    call makeFastq { input: inputBam = filterHostWT.outputBam, rG = inp.readGroup, outputPrefix = outputFileNamePrefix }
   }
   # Also, re-align filtered data with star and merge reports from the classify task
   call star.star as generateFinalBamWT {
     input:
-      inputFqsRgs = makeFastq.fastqData,
-      runStar_genomeIndexDir = resourcesWT[reference].refGraft,
-      runStar_modules = resourcesWT[reference].modules,
+      inputGroups = makeFastq.fastqData,
+      reference = reference,
       outputFileNamePrefix = outputFileNamePrefix
   }
   call mergeReports as mergeReportsWT { input: inputReports = classifyWT.jsonReport, inputRgs = makeFastq.readGroup, outputPrefix = outputFileNamePrefix }
@@ -122,7 +91,7 @@ output {
 }
 
 parameter_meta {
-  inputFastqs: "Array of fastq files for read 1 and 2 along with rG string"
+  inputs: "Array of fastq files for read 1 and 2 along with rG string"
   libraryDesign: "Supported library design acronym. We support WG, EX, TS, WT and MR. Default is WG"
   reference: "The reference of Graft to align the data with by either STAR or BWA"
   outputFileNamePrefix: "Output file name prefix"
@@ -365,7 +334,7 @@ runtime {
 }
 
 output {
-  Pair[Pair[File,File], String] fastqData = (("~{outputPrefix}_part_1.fastq.gz", "~{outputPrefix}_part_2.fastq.gz"), "~{rG}")
+  InputGroup fastqData = {"fastqR1": "~{outputPrefix}_part_1.fastq.gz", "fastqR2": "~{outputPrefix}_part_2.fastq.gz", "ReadGroup": "~{rG}"}
   String readGroup = "~{rG}"
 }
 }

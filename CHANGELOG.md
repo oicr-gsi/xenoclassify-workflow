@@ -1,3 +1,5 @@
+## 1.5.0 - 2022-03-06
+ - updated imported bwaMem (to bwamem2 2.2.1) and star (to 2.3.0)
 ## 1.4.0 - 2022-06-15
  - assembly-specific modules are specified inside the workflow
 ## 1.3.0 - 2022-03-08
