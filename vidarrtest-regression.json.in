@@ -3,6 +3,7 @@
         "arguments": {
             "xenoClassify.libraryDesign": "WG",
             "xenoClassify.reference": "hg19",
+            "xenoClassify.hostReference": "mm10",
             "xenoClassify.classifyWG.difference": null,
             "xenoClassify.classifyWG.jobMemory": null,
             "xenoClassify.classifyWG.modules": null,
@@ -15,8 +16,9 @@
             "xenoClassify.classifyWT.neitherThreshold": null,
             "xenoClassify.classifyWT.timeout": null,
             "xenoClassify.classifyWT.tolerance": null,
-            "xenoClassify.inputFastqs": [{
-            "left": {"left":  {
+            "xenoClassify.inputs":[
+                {
+                    "fastqR1": {
                         "contents": {
                             "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R1_001.fastq.subset.fastq.gz",
                             "externalIds": [
@@ -27,23 +29,21 @@
                             ]
                         },
                         "type": "EXTERNAL"
-                     },
-                     "right": {
-                         "contents": {
-                             "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R2_001.fastq.subset.fastq.gz",
-                             "externalIds": [
-                                 {
-                                     "id": "TEST",
-                                     "provider": "TEST"
-                                 }
-                             ]
-                         },
+                    },
+                    "fastqR2": {
+                        "contents": {
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R2_001.fastq.subset.fastq.gz",
+                            "externalIds": [
+                                {
+                                    "id": "TEST",
+                                    "provider": "TEST"
+                                }
+                            ]
+                        },
                         "type": "EXTERNAL"
-                     }
-             },
-            "right": "'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'"
-            }
-            ],
+                    },
+                    "readGroup": "'@RG\\tID:TEST-RUN_XENO\\tLB:XENOTEST\\tPL:ILLUMINA\\tPU:TEST-RUN_XENO\\tSM:TEST_XENOTEST_X'"
+                }],
             "xenoClassify.filterHostWG.filterTags": [
                 "host",
                 "both",
@@ -64,6 +64,10 @@
             "xenoClassify.filterHostWT.tmpDir": "$TMP",
             "xenoClassify.generateGraftBamWG.adapter1": null,
             "xenoClassify.generateGraftBamWG.adapter2": null,
+            "xenoClassify.generateGraftBamWG.adapterTrimming_doUMItrim": null,
+            "xenoClassify.generateGraftBamWG.adapterTrimming_trimMinLength": null,
+            "xenoClassify.generateGraftBamWG.adapterTrimming_trimMinQuality": null,
+            "xenoClassify.generateGraftBamWG.adapterTrimming_umiLength": null,
             "xenoClassify.generateGraftBamWG.adapterTrimmingLog_jobMemory": null,
             "xenoClassify.generateGraftBamWG.adapterTrimmingLog_timeout": null,
             "xenoClassify.generateGraftBamWG.adapterTrimming_addParam": null,
@@ -74,16 +78,26 @@
             "xenoClassify.generateGraftBamWG.bamMerge_modules": null,
             "xenoClassify.generateGraftBamWG.bamMerge_timeout": null,
             "xenoClassify.generateGraftBamWG.countChunkSize_jobMemory": null,
+            "xenoClassify.generateGraftBamWG.countChunkSize_modules": null,
             "xenoClassify.generateGraftBamWG.countChunkSize_timeout": null,
             "xenoClassify.generateGraftBamWG.doTrim": null,
+            "xenoClassify.generateGraftBamWG.doUMIextract": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_jobMemory": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_modules": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_outputPrefix": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_pattern1": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_pattern2": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_timeout": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_umiList": null,
             "xenoClassify.generateGraftBamWG.indexBam_jobMemory": null,
             "xenoClassify.generateGraftBamWG.indexBam_modules": null,
             "xenoClassify.generateGraftBamWG.indexBam_timeout": null,
             "xenoClassify.generateGraftBamWG.numChunk": null,
-            "xenoClassify.generateGraftBamWG.runBwaMem_addParam": null,
-            "xenoClassify.generateGraftBamWG.runBwaMem_jobMemory": null,
-            "xenoClassify.generateGraftBamWG.runBwaMem_threads": null,
-            "xenoClassify.generateGraftBamWG.runBwaMem_timeout": null,
+            "xenoClassify.generateGraftBamWG.numReads": null,
+            "xenoClassify.generateGraftBamWG.runBwamem2_addParam": null,
+            "xenoClassify.generateGraftBamWG.runBwamem2_jobMemory": null,
+            "xenoClassify.generateGraftBamWG.runBwamem2_threads": null,
+            "xenoClassify.generateGraftBamWG.runBwamem2_timeout": null,
             "xenoClassify.generateGraftBamWG.slicerR1_jobMemory": null,
             "xenoClassify.generateGraftBamWG.slicerR1_modules": null,
             "xenoClassify.generateGraftBamWG.slicerR1_timeout": null,
@@ -94,6 +108,10 @@
             "xenoClassify.generateGraftBamWG.trimMinQuality": null,
             "xenoClassify.generateHostBamWG.adapter1": null,
             "xenoClassify.generateHostBamWG.adapter2": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_doUMItrim": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_trimMinLength": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_trimMinQuality": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_umiLength": null,
             "xenoClassify.generateHostBamWG.adapterTrimmingLog_jobMemory": null,
             "xenoClassify.generateHostBamWG.adapterTrimmingLog_timeout": null,
             "xenoClassify.generateHostBamWG.adapterTrimming_addParam": null,
@@ -105,15 +123,25 @@
             "xenoClassify.generateHostBamWG.bamMerge_timeout": null,
             "xenoClassify.generateHostBamWG.countChunkSize_jobMemory": null,
             "xenoClassify.generateHostBamWG.countChunkSize_timeout": null,
+            "xenoClassify.generateHostBamWG.countChunkSize_modules": null,
             "xenoClassify.generateHostBamWG.doTrim": null,
+            "xenoClassify.generateHostBamWG.doUMIextract": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_jobMemory": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_modules": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_outputPrefix": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_pattern1": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_pattern2": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_timeout": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_umiList": null,
             "xenoClassify.generateHostBamWG.indexBam_jobMemory": null,
             "xenoClassify.generateHostBamWG.indexBam_modules": null,
             "xenoClassify.generateHostBamWG.indexBam_timeout": null,
             "xenoClassify.generateHostBamWG.numChunk": null,
-            "xenoClassify.generateHostBamWG.runBwaMem_addParam": null,
-            "xenoClassify.generateHostBamWG.runBwaMem_jobMemory": null,
-            "xenoClassify.generateHostBamWG.runBwaMem_threads": null,
-            "xenoClassify.generateHostBamWG.runBwaMem_timeout": null,
+            "xenoClassify.generateHostBamWG.numReads": null,
+            "xenoClassify.generateHostBamWG.runBwamem2_addParam": null,
+            "xenoClassify.generateHostBamWG.runBwamem2_jobMemory": null,
+            "xenoClassify.generateHostBamWG.runBwamem2_threads": null,
+            "xenoClassify.generateHostBamWG.runBwamem2_timeout": null,
             "xenoClassify.generateHostBamWG.slicerR1_jobMemory": null,
             "xenoClassify.generateHostBamWG.slicerR1_modules": null,
             "xenoClassify.generateHostBamWG.slicerR1_timeout": null,
@@ -130,16 +158,21 @@
             "xenoClassify.generateGraftBamWT.runStar_alignMatGapMax": null,
             "xenoClassify.generateGraftBamWT.runStar_alignSJDBOvMin": null,
             "xenoClassify.generateGraftBamWT.runStar_chimericjunctionSuffix": null,
+            "xenoClassify.generateGraftBamWT.runStar_chimOutType": null,
             "xenoClassify.generateGraftBamWT.runStar_chimJunOvMin": null,
             "xenoClassify.generateGraftBamWT.runStar_chimMulmapNmax": null,
             "xenoClassify.generateGraftBamWT.runStar_chimMulmapScoRan": null,
             "xenoClassify.generateGraftBamWT.runStar_chimNonchimScoDMin": null,
             "xenoClassify.generateGraftBamWT.runStar_chimOutJunForm": null,
             "xenoClassify.generateGraftBamWT.runStar_chimScoJunNonGTAG": null,
+            "xenoClassify.generateGraftBamWT.runStar_chimScoreDropMax": null,
+            "xenoClassify.generateGraftBamWT.runStar_chimScoreSeparation": null,
+            "xenoClassify.generateGraftBamWT.runStar_chimSegmentReadGapMax": null,
             "xenoClassify.generateGraftBamWT.runStar_chimSegmin": null,
             "xenoClassify.generateGraftBamWT.runStar_genereadSuffix": null,
             "xenoClassify.generateGraftBamWT.runStar_jobMemory": null,
             "xenoClassify.generateGraftBamWT.runStar_multiMax": null,
+            "xenoClassify.generateGraftBamWT.runStar_outFilterMultimapNmax": null,
             "xenoClassify.generateGraftBamWT.runStar_peOvMMp": null,
             "xenoClassify.generateGraftBamWT.runStar_peOvNbasesMin": null,
             "xenoClassify.generateGraftBamWT.runStar_saSparsed": null,
@@ -157,15 +190,20 @@
             "xenoClassify.generateHostBamWT.runStar_alignSJDBOvMin": null,
             "xenoClassify.generateHostBamWT.runStar_chimericjunctionSuffix": null,
             "xenoClassify.generateHostBamWT.runStar_chimJunOvMin": null,
+            "xenoClassify.generateHostBamWT.runStar_chimOutType": null,
             "xenoClassify.generateHostBamWT.runStar_chimMulmapNmax": null,
             "xenoClassify.generateHostBamWT.runStar_chimMulmapScoRan": null,
             "xenoClassify.generateHostBamWT.runStar_chimNonchimScoDMin": null,
             "xenoClassify.generateHostBamWT.runStar_chimOutJunForm": null,
             "xenoClassify.generateHostBamWT.runStar_chimScoJunNonGTAG": null,
+            "xenoClassify.generateHostBamWT.runStar_chimScoreDropMax": null,
+            "xenoClassify.generateHostBamWT.runStar_chimScoreSeparation": null,
+            "xenoClassify.generateHostBamWT.runStar_chimSegmentReadGapMax": null,
             "xenoClassify.generateHostBamWT.runStar_chimSegmin": null,
             "xenoClassify.generateHostBamWT.runStar_genereadSuffix": null,
             "xenoClassify.generateHostBamWT.runStar_jobMemory": null,
             "xenoClassify.generateHostBamWT.runStar_multiMax": null,
+            "xenoClassify.generateHostBamWT.runStar_outFilterMultimapNmax": null,
             "xenoClassify.generateHostBamWT.runStar_peOvMMp": null,
             "xenoClassify.generateHostBamWT.runStar_peOvNbasesMin": null,
             "xenoClassify.generateHostBamWT.runStar_saSparsed": null,
@@ -186,12 +224,16 @@
             "xenoClassify.generateFinalBamWT.runStar_chimMulmapNmax": null,
             "xenoClassify.generateFinalBamWT.runStar_chimMulmapScoRan": null,
             "xenoClassify.generateFinalBamWT.runStar_chimNonchimScoDMin": null,
-            "xenoClassify.generateFinalBamWT.runStar_chimOutJunForm": null,
+            "xenoClassify.generateFinalBamWT.runStar_chimOutType": null,
+            "xenoClassify.generateFinalBamWT.runStar_chimScoreDropMax": null,
+            "xenoClassify.generateFinalBamWT.runStar_chimScoreSeparation": null,
+            "xenoClassify.generateFinalBamWT.runStar_chimSegmentReadGapMax": null, 
             "xenoClassify.generateFinalBamWT.runStar_chimScoJunNonGTAG": null,
             "xenoClassify.generateFinalBamWT.runStar_chimSegmin": null,
             "xenoClassify.generateFinalBamWT.runStar_genereadSuffix": null,
             "xenoClassify.generateFinalBamWT.runStar_jobMemory": null,
             "xenoClassify.generateFinalBamWT.runStar_multiMax": null,
+            "xenoClassify.generateFinalBamWT.runStar_outFilterMultimapNmax": null,
             "xenoClassify.generateFinalBamWT.runStar_peOvMMp": null,
             "xenoClassify.generateFinalBamWT.runStar_peOvNbasesMin": null,
             "xenoClassify.generateFinalBamWT.runStar_saSparsed": null,
@@ -205,6 +247,9 @@
             "xenoClassify.makeFastq.overhead": null,
             "xenoClassify.makeFastq.picardParams": null,
             "xenoClassify.makeFastq.timeout": null,
+            "xenoClassify.mergeBams.jobMemory": null,
+            "xenoClassify.mergeBams.modules": null,
+            "xenoClassify.mergeBams.timeout": null,
             "xenoClassify.mergeReportsWT.timeout": null,
             "xenoClassify.mergeReportsWG.timeout": null,
             "xenoClassify.mergeReportsWT.modules": null,
@@ -212,10 +257,12 @@
             "xenoClassify.mergeReportsWT.jobMemory": null,
             "xenoClassify.mergeReportsWG.jobMemory": null,
             "xenoClassify.outputFileNamePrefix": "Xenoclassify",
+            "xenoClassify.sortGraftBamWG.filterSupAlignments": null,
             "xenoClassify.sortGraftBamWG.jobMemory": null,
             "xenoClassify.sortGraftBamWG.modules": null,
             "xenoClassify.sortGraftBamWG.timeout": null,
             "xenoClassify.sortGraftBamWG.tmpDir": null,
+            "xenoClassify.sortHostBamWG.filterSupAlignments": null,
             "xenoClassify.sortHostBamWG.jobMemory": null,
             "xenoClassify.sortHostBamWG.modules": null,
             "xenoClassify.sortHostBamWG.timeout": null,
@@ -289,7 +336,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/PCSI_0044_DOWNSAMPLED_ONLYGRAFT.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/1.5/PCSI_0044_DOWNSAMPLED_ONLYGRAFT.metrics",
                 "type": "script"
             }
         ]
@@ -298,6 +345,7 @@
         "arguments": {
             "xenoClassify.libraryDesign": "WT",
             "xenoClassify.reference": "hg19",
+            "xenoClassify.hostReference": "mm10",
             "xenoClassify.classifyWG.difference": null,
             "xenoClassify.classifyWG.jobMemory": null,
             "xenoClassify.classifyWG.modules": null,
@@ -310,8 +358,8 @@
             "xenoClassify.classifyWT.neitherThreshold": null,
             "xenoClassify.classifyWT.timeout": null,
             "xenoClassify.classifyWT.tolerance": null,
-            "xenoClassify.inputFastqs": [{
-            "left": {"left":  {
+            "xenoClassify.inputs": [{
+                    "fastqR1":  {
                         "contents": {
                             "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/k562_NoIndex_L001_R1_001.fastq.gz",
                             "externalIds": [
@@ -323,7 +371,7 @@
                         },
                         "type": "EXTERNAL"
                      },
-                     "right": {
+                     "fastqR2": {
                          "contents": {
                              "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/k562_NoIndex_L001_R2_001.fastq.gz",
                              "externalIds": [
@@ -334,10 +382,9 @@
                              ]
                          },
                         "type": "EXTERNAL"
-                     }
-             },
-            "right": "'ID:TEST-RUN_XENO LB:XENOTEST PL:ILLUMINA PU:TEST-RUN_XENO SM:TEST_XENOTEST_X'"
-            }
+                     },
+                     "readGroup": "'ID:TEST-RUN_XENO LB:XENOTEST PL:ILLUMINA PU:TEST-RUN_XENO SM:TEST_XENOTEST_X'"
+                    }
             ],
             "xenoClassify.filterHostWG.filterTags": [
                 "host",
@@ -365,20 +412,34 @@
             "xenoClassify.generateGraftBamWG.adapterTrimming_jobMemory": null,
             "xenoClassify.generateGraftBamWG.adapterTrimming_modules": null,
             "xenoClassify.generateGraftBamWG.adapterTrimming_timeout": null,
+            "xenoClassify.generateGraftBamWG.adapterTrimming_doUMItrim": null,
+            "xenoClassify.generateGraftBamWG.adapterTrimming_trimMinLength": null,
+            "xenoClassify.generateGraftBamWG.adapterTrimming_trimMinQuality": null,
+            "xenoClassify.generateGraftBamWG.adapterTrimming_umiLength": null,
             "xenoClassify.generateGraftBamWG.bamMerge_jobMemory": null,
             "xenoClassify.generateGraftBamWG.bamMerge_modules": null,
             "xenoClassify.generateGraftBamWG.bamMerge_timeout": null,
             "xenoClassify.generateGraftBamWG.countChunkSize_jobMemory": null,
+            "xenoClassify.generateGraftBamWG.countChunkSize_modules": null,
             "xenoClassify.generateGraftBamWG.countChunkSize_timeout": null,
             "xenoClassify.generateGraftBamWG.doTrim": null,
+            "xenoClassify.generateGraftBamWG.doUMIextract": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_jobMemory": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_modules": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_outputPrefix": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_pattern1": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_pattern2": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_timeout": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_umiList": null,
             "xenoClassify.generateGraftBamWG.indexBam_jobMemory": null,
             "xenoClassify.generateGraftBamWG.indexBam_modules": null,
             "xenoClassify.generateGraftBamWG.indexBam_timeout": null,
             "xenoClassify.generateGraftBamWG.numChunk": null,
-            "xenoClassify.generateGraftBamWG.runBwaMem_addParam": null,
-            "xenoClassify.generateGraftBamWG.runBwaMem_jobMemory": null,
-            "xenoClassify.generateGraftBamWG.runBwaMem_threads": null,
-            "xenoClassify.generateGraftBamWG.runBwaMem_timeout": null,
+            "xenoClassify.generateGraftBamWG.numReads": null,
+            "xenoClassify.generateGraftBamWG.runBwamem2_addParam": null,
+            "xenoClassify.generateGraftBamWG.runBwamem2_jobMemory": null,
+            "xenoClassify.generateGraftBamWG.runBwamem2_threads": null,
+            "xenoClassify.generateGraftBamWG.runBwamem2_timeout": null,
             "xenoClassify.generateGraftBamWG.slicerR1_jobMemory": null,
             "xenoClassify.generateGraftBamWG.slicerR1_modules": null,
             "xenoClassify.generateGraftBamWG.slicerR1_timeout": null,
@@ -395,20 +456,34 @@
             "xenoClassify.generateHostBamWG.adapterTrimming_jobMemory": null,
             "xenoClassify.generateHostBamWG.adapterTrimming_modules": null,
             "xenoClassify.generateHostBamWG.adapterTrimming_timeout": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_doUMItrim": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_trimMinLength": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_trimMinQuality": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_umiLength": null,
             "xenoClassify.generateHostBamWG.bamMerge_jobMemory": null,
             "xenoClassify.generateHostBamWG.bamMerge_modules": null,
             "xenoClassify.generateHostBamWG.bamMerge_timeout": null,
             "xenoClassify.generateHostBamWG.countChunkSize_jobMemory": null,
+            "xenoClassify.generateHostBamWG.countChunkSize_modules": null,
             "xenoClassify.generateHostBamWG.countChunkSize_timeout": null,
             "xenoClassify.generateHostBamWG.doTrim": null,
+            "xenoClassify.generateHostBamWG.doUMIextract": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_jobMemory": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_modules": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_outputPrefix": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_pattern1": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_pattern2": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_timeout": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_umiList": null,
             "xenoClassify.generateHostBamWG.indexBam_jobMemory": null,
             "xenoClassify.generateHostBamWG.indexBam_modules": null,
             "xenoClassify.generateHostBamWG.indexBam_timeout": null,
             "xenoClassify.generateHostBamWG.numChunk": null,
-            "xenoClassify.generateHostBamWG.runBwaMem_addParam": null,
-            "xenoClassify.generateHostBamWG.runBwaMem_jobMemory": null,
-            "xenoClassify.generateHostBamWG.runBwaMem_threads": null,
-            "xenoClassify.generateHostBamWG.runBwaMem_timeout": null,
+            "xenoClassify.generateHostBamWG.numReads": null,
+            "xenoClassify.generateHostBamWG.runBwamem2_addParam": null,
+            "xenoClassify.generateHostBamWG.runBwamem2_jobMemory": null,
+            "xenoClassify.generateHostBamWG.runBwamem2_threads": null,
+            "xenoClassify.generateHostBamWG.runBwamem2_timeout": null,
             "xenoClassify.generateHostBamWG.slicerR1_jobMemory": null,
             "xenoClassify.generateHostBamWG.slicerR1_modules": null,
             "xenoClassify.generateHostBamWG.slicerR1_timeout": null,
@@ -426,15 +501,20 @@
             "xenoClassify.generateGraftBamWT.runStar_alignSJDBOvMin": null,
             "xenoClassify.generateGraftBamWT.runStar_chimericjunctionSuffix": null,
             "xenoClassify.generateGraftBamWT.runStar_chimJunOvMin": null,
+            "xenoClassify.generateGraftBamWT.runStar_chimOutType": null,
             "xenoClassify.generateGraftBamWT.runStar_chimMulmapNmax": null,
             "xenoClassify.generateGraftBamWT.runStar_chimMulmapScoRan": null,
             "xenoClassify.generateGraftBamWT.runStar_chimNonchimScoDMin": null,
             "xenoClassify.generateGraftBamWT.runStar_chimOutJunForm": null,
             "xenoClassify.generateGraftBamWT.runStar_chimScoJunNonGTAG": null,
+            "xenoClassify.generateGraftBamWT.runStar_chimScoreDropMax": null,
+            "xenoClassify.generateGraftBamWT.runStar_chimScoreSeparation": null,
+            "xenoClassify.generateGraftBamWT.runStar_chimSegmentReadGapMax": null,
             "xenoClassify.generateGraftBamWT.runStar_chimSegmin": null,
             "xenoClassify.generateGraftBamWT.runStar_genereadSuffix": null,
             "xenoClassify.generateGraftBamWT.runStar_jobMemory": null,
             "xenoClassify.generateGraftBamWT.runStar_multiMax": null,
+            "xenoClassify.generateGraftBamWT.runStar_outFilterMultimapNmax": null,
             "xenoClassify.generateGraftBamWT.runStar_peOvMMp": null,
             "xenoClassify.generateGraftBamWT.runStar_peOvNbasesMin": null,
             "xenoClassify.generateGraftBamWT.runStar_saSparsed": null,
@@ -452,15 +532,20 @@
             "xenoClassify.generateHostBamWT.runStar_alignSJDBOvMin": null,
             "xenoClassify.generateHostBamWT.runStar_chimericjunctionSuffix": null,
             "xenoClassify.generateHostBamWT.runStar_chimJunOvMin": null,
+            "xenoClassify.generateHostBamWT.runStar_chimOutType": null,
             "xenoClassify.generateHostBamWT.runStar_chimMulmapNmax": null,
             "xenoClassify.generateHostBamWT.runStar_chimMulmapScoRan": null,
             "xenoClassify.generateHostBamWT.runStar_chimNonchimScoDMin": null,
             "xenoClassify.generateHostBamWT.runStar_chimOutJunForm": null,
             "xenoClassify.generateHostBamWT.runStar_chimScoJunNonGTAG": null,
+            "xenoClassify.generateHostBamWT.runStar_chimScoreDropMax": null,
+            "xenoClassify.generateHostBamWT.runStar_chimScoreSeparation": null,
+            "xenoClassify.generateHostBamWT.runStar_chimSegmentReadGapMax": null,
             "xenoClassify.generateHostBamWT.runStar_chimSegmin": null,
             "xenoClassify.generateHostBamWT.runStar_genereadSuffix": null,
             "xenoClassify.generateHostBamWT.runStar_jobMemory": null,
             "xenoClassify.generateHostBamWT.runStar_multiMax": null,
+            "xenoClassify.generateHostBamWT.runStar_outFilterMultimapNmax": null,
             "xenoClassify.generateHostBamWT.runStar_peOvMMp": null,
             "xenoClassify.generateHostBamWT.runStar_peOvNbasesMin": null,
             "xenoClassify.generateHostBamWT.runStar_saSparsed": null,
@@ -477,6 +562,10 @@
             "xenoClassify.generateFinalBamWT.runStar_alignMatGapMax": null,
             "xenoClassify.generateFinalBamWT.runStar_alignSJDBOvMin": null,
             "xenoClassify.generateFinalBamWT.runStar_chimericjunctionSuffix": null,
+            "xenoClassify.generateFinalBamWT.runStar_chimOutType": null,
+            "xenoClassify.generateFinalBamWT.runStar_chimScoreDropMax": null,
+            "xenoClassify.generateFinalBamWT.runStar_chimScoreSeparation": null,
+            "xenoClassify.generateFinalBamWT.runStar_chimSegmentReadGapMax": null,
             "xenoClassify.generateFinalBamWT.runStar_chimJunOvMin": null,
             "xenoClassify.generateFinalBamWT.runStar_chimMulmapNmax": null,
             "xenoClassify.generateFinalBamWT.runStar_chimMulmapScoRan": null,
@@ -487,6 +576,7 @@
             "xenoClassify.generateFinalBamWT.runStar_genereadSuffix": null,
             "xenoClassify.generateFinalBamWT.runStar_jobMemory": null,
             "xenoClassify.generateFinalBamWT.runStar_multiMax": null,
+            "xenoClassify.generateFinalBamWT.runStar_outFilterMultimapNmax": null,
             "xenoClassify.generateFinalBamWT.runStar_peOvMMp": null,
             "xenoClassify.generateFinalBamWT.runStar_peOvNbasesMin": null,
             "xenoClassify.generateFinalBamWT.runStar_saSparsed": null,
@@ -500,6 +590,9 @@
             "xenoClassify.makeFastq.overhead": null,
             "xenoClassify.makeFastq.picardParams": null,
             "xenoClassify.makeFastq.timeout": null,
+            "xenoClassify.mergeBams.jobMemory": null,
+            "xenoClassify.mergeBams.modules": null,
+            "xenoClassify.mergeBams.timeout": null,
             "xenoClassify.mergeReportsWT.timeout": null,
             "xenoClassify.mergeReportsWG.timeout": null,
             "xenoClassify.mergeReportsWT.modules": null,
@@ -507,10 +600,12 @@
             "xenoClassify.mergeReportsWT.jobMemory": null,
             "xenoClassify.mergeReportsWG.jobMemory": null,
             "xenoClassify.outputFileNamePrefix": "Xenoclassify",
+            "xenoClassify.sortGraftBamWG.filterSupAlignments": null,
             "xenoClassify.sortGraftBamWG.jobMemory": null,
             "xenoClassify.sortGraftBamWG.modules": null,
             "xenoClassify.sortGraftBamWG.timeout": null,
             "xenoClassify.sortGraftBamWG.tmpDir": null,
+            "xenoClassify.sortHostBamWG.filterSupAlignments": null,
             "xenoClassify.sortHostBamWG.jobMemory": null,
             "xenoClassify.sortHostBamWG.modules": null,
             "xenoClassify.sortHostBamWG.timeout": null,
@@ -584,7 +679,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/K562_DOWNSAMPLED_ONLYGRAFT.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/1.5/K562_DOWNSAMPLED_ONLYGRAFT.metrics",
                 "type": "script"
             }
         ]
@@ -593,6 +688,7 @@
         "arguments": {
             "xenoClassify.libraryDesign": "WT",
             "xenoClassify.reference": "hg38",
+            "xenoClassify.hostReference": "mm10",
             "xenoClassify.classifyWG.difference": null,
             "xenoClassify.classifyWG.jobMemory": null,
             "xenoClassify.classifyWG.modules": null,
@@ -606,8 +702,7 @@
             "xenoClassify.classifyWT.timeout": null,
             "xenoClassify.classifyWT.tolerance": null,
             "xenoClassify.inputFastqs": [{
-              "left": {
-                 "left":  {
+                 "fastqR1":  {
                         "contents": {
                             "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT_R1_subs.fastq.gz",
                             "externalIds": [
@@ -619,7 +714,7 @@
                         },
                         "type": "EXTERNAL"
                      },
-                 "right": {
+                 "fastqR2": {
                         "contents": {
                             "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT_R2_subs.fastq.gz",
                             "externalIds": [
@@ -630,13 +725,11 @@
                             ]
                        },
                        "type": "EXTERNAL"
-                }
-               }, 
-               "right": "ID:210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT PL:ILLUMINA PU:210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT LB:PTXNASH_0005_Lv_O_PE_349_WT SM:PTXNASH_0005_Lv_O_NAFLD-1 CM:OICR"
+                },
+               "readGroup": "ID:210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT PL:ILLUMINA PU:210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT LB:PTXNASH_0005_Lv_O_PE_349_WT SM:PTXNASH_0005_Lv_O_NAFLD-1 CM:OICR"
             },
             {
-              "left": {
-                 "left": {
+                 "fastqR1": {
                         "contents": {
                             "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT_R1_subs.fastq.gz", 
                             "externalIds": [
@@ -648,7 +741,7 @@
                         },
                         "type": "EXTERNAL"
                      },
-                 "right": {
+                 "fastqR2": {
                         "contents": {
                             "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT_R2_subs.fastq.gz",
                             "externalIds": [
@@ -659,9 +752,8 @@
                             ]
                         },
                         "type": "EXTERNAL"
-               }
-              },
-              "right": "ID:210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT PL:ILLUMINA PU:210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT LB:PTXNASH_0005_Lv_O_PE_349_WT SM:PTXNASH_0005_Lv_O_NAFLD-1 CM:OICR"
+                 },
+                 "readGroup": "ID:210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT PL:ILLUMINA PU:210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT LB:PTXNASH_0005_Lv_O_PE_349_WT SM:PTXNASH_0005_Lv_O_NAFLD-1 CM:OICR"
              }
             ],
             "xenoClassify.filterHostWG.filterTags": [
@@ -684,6 +776,10 @@
             "xenoClassify.filterHostWT.tmpDir": "$TMP",
             "xenoClassify.generateGraftBamWG.adapter1": null,
             "xenoClassify.generateGraftBamWG.adapter2": null,
+            "xenoClassify.generateGraftBamWG.adapterTrimming_doUMItrim": null,
+            "xenoClassify.generateGraftBamWG.adapterTrimming_trimMinLength": null,
+            "xenoClassify.generateGraftBamWG.adapterTrimming_trimMinQuality": null,
+            "xenoClassify.generateGraftBamWG.adapterTrimming_umiLength": null,
             "xenoClassify.generateGraftBamWG.adapterTrimmingLog_jobMemory": null,
             "xenoClassify.generateGraftBamWG.adapterTrimmingLog_timeout": null,
             "xenoClassify.generateGraftBamWG.adapterTrimming_addParam": null,
@@ -694,16 +790,26 @@
             "xenoClassify.generateGraftBamWG.bamMerge_modules": null,
             "xenoClassify.generateGraftBamWG.bamMerge_timeout": null,
             "xenoClassify.generateGraftBamWG.countChunkSize_jobMemory": null,
+            "xenoClassify.generateGraftBamWG.countChunkSize_modules": null,
             "xenoClassify.generateGraftBamWG.countChunkSize_timeout": null,
             "xenoClassify.generateGraftBamWG.doTrim": null,
+            "xenoClassify.generateGraftBamWG.doUMIextract": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_jobMemory": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_modules": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_outputPrefix": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_pattern1": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_pattern2": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_timeout": null,
+            "xenoClassify.generateGraftBamWG.extractUMIs_umiList": null,
             "xenoClassify.generateGraftBamWG.indexBam_jobMemory": null,
             "xenoClassify.generateGraftBamWG.indexBam_modules": null,
             "xenoClassify.generateGraftBamWG.indexBam_timeout": null,
             "xenoClassify.generateGraftBamWG.numChunk": null,
-            "xenoClassify.generateGraftBamWG.runBwaMem_addParam": null,
-            "xenoClassify.generateGraftBamWG.runBwaMem_jobMemory": null,
-            "xenoClassify.generateGraftBamWG.runBwaMem_threads": null,
-            "xenoClassify.generateGraftBamWG.runBwaMem_timeout": null,
+            "xenoClassify.generateGraftBamWG.numReads": null,
+            "xenoClassify.generateGraftBamWG.runBwamem2_addParam": null,
+            "xenoClassify.generateGraftBamWG.runBwamem2_jobMemory": null,
+            "xenoClassify.generateGraftBamWG.runBwamem2_threads": null,
+            "xenoClassify.generateGraftBamWG.runBwamem2_timeout": null,
             "xenoClassify.generateGraftBamWG.slicerR1_jobMemory": null,
             "xenoClassify.generateGraftBamWG.slicerR1_modules": null,
             "xenoClassify.generateGraftBamWG.slicerR1_timeout": null,
@@ -714,6 +820,10 @@
             "xenoClassify.generateGraftBamWG.trimMinQuality": null,
             "xenoClassify.generateHostBamWG.adapter1": null,
             "xenoClassify.generateHostBamWG.adapter2": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_doUMItrim": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_trimMinLength": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_trimMinQuality": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_umiLength": null,
             "xenoClassify.generateHostBamWG.adapterTrimmingLog_jobMemory": null,
             "xenoClassify.generateHostBamWG.adapterTrimmingLog_timeout": null,
             "xenoClassify.generateHostBamWG.adapterTrimming_addParam": null,
@@ -724,16 +834,26 @@
             "xenoClassify.generateHostBamWG.bamMerge_modules": null,
             "xenoClassify.generateHostBamWG.bamMerge_timeout": null,
             "xenoClassify.generateHostBamWG.countChunkSize_jobMemory": null,
+            "xenoClassify.generateHostBamWG.countChunkSize_modules": null,
             "xenoClassify.generateHostBamWG.countChunkSize_timeout": null,
             "xenoClassify.generateHostBamWG.doTrim": null,
+            "xenoClassify.generateHostBamWG.doUMIextract": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_jobMemory": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_modules": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_outputPrefix": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_pattern1": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_pattern2": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_timeout": null,
+            "xenoClassify.generateHostBamWG.extractUMIs_umiList": null,
             "xenoClassify.generateHostBamWG.indexBam_jobMemory": null,
             "xenoClassify.generateHostBamWG.indexBam_modules": null,
             "xenoClassify.generateHostBamWG.indexBam_timeout": null,
             "xenoClassify.generateHostBamWG.numChunk": null,
-            "xenoClassify.generateHostBamWG.runBwaMem_addParam": null,
-            "xenoClassify.generateHostBamWG.runBwaMem_jobMemory": null,
-            "xenoClassify.generateHostBamWG.runBwaMem_threads": null,
-            "xenoClassify.generateHostBamWG.runBwaMem_timeout": null,
+            "xenoClassify.generateHostBamWG.numReads": null,
+            "xenoClassify.generateHostBamWG.runBwamem2_addParam": null,
+            "xenoClassify.generateHostBamWG.runBwamem2_jobMemory": null,
+            "xenoClassify.generateHostBamWG.runBwamem2_threads": null,
+            "xenoClassify.generateHostBamWG.runBwamem2_timeout": null,
             "xenoClassify.generateHostBamWG.slicerR1_jobMemory": null,
             "xenoClassify.generateHostBamWG.slicerR1_modules": null,
             "xenoClassify.generateHostBamWG.slicerR1_timeout": null,
@@ -750,16 +870,21 @@
             "xenoClassify.generateGraftBamWT.runStar_alignMatGapMax": null,
             "xenoClassify.generateGraftBamWT.runStar_alignSJDBOvMin": null,
             "xenoClassify.generateGraftBamWT.runStar_chimericjunctionSuffix": null,
+            "xenoClassify.generateGraftBamWT.runStar_chimOutType": null,
             "xenoClassify.generateGraftBamWT.runStar_chimJunOvMin": null,
             "xenoClassify.generateGraftBamWT.runStar_chimMulmapNmax": null,
             "xenoClassify.generateGraftBamWT.runStar_chimMulmapScoRan": null,
             "xenoClassify.generateGraftBamWT.runStar_chimNonchimScoDMin": null,
             "xenoClassify.generateGraftBamWT.runStar_chimOutJunForm": null,
             "xenoClassify.generateGraftBamWT.runStar_chimScoJunNonGTAG": null,
+            "xenoClassify.generateGraftBamWT.runStar_chimScoreDropMax": null,
+            "xenoClassify.generateGraftBamWT.runStar_chimScoreSeparation": null,
+            "xenoClassify.generateGraftBamWT.runStar_chimSegmentReadGapMax": null,
             "xenoClassify.generateGraftBamWT.runStar_chimSegmin": null,
             "xenoClassify.generateGraftBamWT.runStar_genereadSuffix": null,
             "xenoClassify.generateGraftBamWT.runStar_jobMemory": null,
             "xenoClassify.generateGraftBamWT.runStar_multiMax": null,
+            "xenoClassify.generateGraftBamWT.runStar_outFilterMultimapNmax": null,
             "xenoClassify.generateGraftBamWT.runStar_peOvMMp": null,
             "xenoClassify.generateGraftBamWT.runStar_peOvNbasesMin": null,
             "xenoClassify.generateGraftBamWT.runStar_saSparsed": null,
@@ -776,16 +901,21 @@
             "xenoClassify.generateHostBamWT.runStar_alignMatGapMax": null,
             "xenoClassify.generateHostBamWT.runStar_alignSJDBOvMin": null,
             "xenoClassify.generateHostBamWT.runStar_chimericjunctionSuffix": null,
+            "xenoClassify.generateHostBamWT.runStar_chimOutType": null,
             "xenoClassify.generateHostBamWT.runStar_chimJunOvMin": null,
             "xenoClassify.generateHostBamWT.runStar_chimMulmapNmax": null,
             "xenoClassify.generateHostBamWT.runStar_chimMulmapScoRan": null,
             "xenoClassify.generateHostBamWT.runStar_chimNonchimScoDMin": null,
             "xenoClassify.generateHostBamWT.runStar_chimOutJunForm": null,
             "xenoClassify.generateHostBamWT.runStar_chimScoJunNonGTAG": null,
+            "xenoClassify.generateHostBamWT.runStar_chimScoreDropMax": null,
+            "xenoClassify.generateHostBamWT.runStar_chimScoreSeparation": null,
+            "xenoClassify.generateHostBamWT.runStar_chimSegmentReadGapMax": null,
             "xenoClassify.generateHostBamWT.runStar_chimSegmin": null,
             "xenoClassify.generateHostBamWT.runStar_genereadSuffix": null,
             "xenoClassify.generateHostBamWT.runStar_jobMemory": null,
             "xenoClassify.generateHostBamWT.runStar_multiMax": null,
+            "xenoClassify.generateHostBamWT.runStar_outFilterMultimapNmax": null,
             "xenoClassify.generateHostBamWT.runStar_peOvMMp": null,
             "xenoClassify.generateHostBamWT.runStar_peOvNbasesMin": null,
             "xenoClassify.generateHostBamWT.runStar_saSparsed": null,
@@ -802,16 +932,21 @@
             "xenoClassify.generateFinalBamWT.runStar_alignMatGapMax": null,
             "xenoClassify.generateFinalBamWT.runStar_alignSJDBOvMin": null,
             "xenoClassify.generateFinalBamWT.runStar_chimericjunctionSuffix": null,
+            "xenoClassify.generateFinalBamWT.runStar_chimOutType": null,
             "xenoClassify.generateFinalBamWT.runStar_chimJunOvMin": null,
             "xenoClassify.generateFinalBamWT.runStar_chimMulmapNmax": null,
             "xenoClassify.generateFinalBamWT.runStar_chimMulmapScoRan": null,
             "xenoClassify.generateFinalBamWT.runStar_chimNonchimScoDMin": null,
             "xenoClassify.generateFinalBamWT.runStar_chimOutJunForm": null,
             "xenoClassify.generateFinalBamWT.runStar_chimScoJunNonGTAG": null,
+            "xenoClassify.generateFinalBamWT.runStar_chimScoreDropMax": null,
+            "xenoClassify.generateFinalBamWT.runStar_chimScoreSeparation": null,
+            "xenoClassify.generateFinalBamWT.runStar_chimSegmentReadGapMax": null,
             "xenoClassify.generateFinalBamWT.runStar_chimSegmin": null,
             "xenoClassify.generateFinalBamWT.runStar_genereadSuffix": null,
             "xenoClassify.generateFinalBamWT.runStar_jobMemory": null,
             "xenoClassify.generateFinalBamWT.runStar_multiMax": null,
+            "xenoClassify.generateFinalBamWT.runStar_outFilterMultimapNmax": null,
             "xenoClassify.generateFinalBamWT.runStar_peOvMMp": null,
             "xenoClassify.generateFinalBamWT.runStar_peOvNbasesMin": null,
             "xenoClassify.generateFinalBamWT.runStar_saSparsed": null,
@@ -825,6 +960,9 @@
             "xenoClassify.makeFastq.overhead": null,
             "xenoClassify.makeFastq.picardParams": null,
             "xenoClassify.makeFastq.timeout": null,
+            "xenoClassify.mergeBams.jobMemory": null,
+            "xenoClassify.mergeBams.modules": null,
+            "xenoClassify.mergeBams.timeout": null,
             "xenoClassify.mergeReportsWT.timeout": null,
             "xenoClassify.mergeReportsWG.timeout": null,
             "xenoClassify.mergeReportsWT.modules": null,
@@ -840,10 +978,12 @@
             "xenoClassify.sortHostBamWG.modules": null,
             "xenoClassify.sortHostBamWG.timeout": null,
             "xenoClassify.sortHostBamWG.tmpDir": null,
+            "xenoClassify.sortGraftBamWG.filterSupAlignments": null,
             "xenoClassify.sortGraftBamWT.jobMemory": null,
             "xenoClassify.sortGraftBamWT.modules": null,
             "xenoClassify.sortGraftBamWT.timeout": null,
             "xenoClassify.sortGraftBamWT.tmpDir": null,
+            "xenoClassify.sortHostBamWG.filterSupAlignments": null,
             "xenoClassify.sortHostBamWT.jobMemory": null,
             "xenoClassify.sortHostBamWT.modules": null,
             "xenoClassify.sortHostBamWT.timeout": null,
@@ -909,7 +1049,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/PTXNASH_DOWNSAMPLED_ONLYGRAFT.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/1.5/PTXNASH_DOWNSAMPLED_ONLYGRAFT.metrics",
                 "type": "script"
             }
         ]

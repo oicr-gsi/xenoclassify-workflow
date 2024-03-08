@@ -68,7 +68,7 @@ workflow star {
       "modules": "hg19-star-index100/2.7.10b"
     },
     "mm10": {
-      "genomeIndexDir": "MM10_STAR_INDEX100_ROOT/",
+      "genomeIndexDir": "$MM10_STAR_INDEX100_ROOT/",
       "modules": "mm10-star-index100/2.7.6a"
     }
   }
@@ -287,8 +287,8 @@ command <<<
       --chimNonchimScoreDropMin ~{chimNonchimScoDMin} ~{"--chimOutJunctionFormat " + chimOutJunForm} \
       --peOverlapNbasesMin ~{peOvNbasesMin} \
       --peOverlapMMp ~{peOvMMp} \
+      --runThreadN ~{threads}  \
       --outFilterMultimapNmax ~{outFilterMultimapNmax} \
-      --runThreadN ~{threads} \
       --chimOutType ~{chimOutType} \
       --chimScoreDropMax ~{chimScoreDropMax} \
       --chimScoreSeparation ~{chimScoreSeparation} \

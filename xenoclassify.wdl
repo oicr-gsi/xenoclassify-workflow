@@ -14,61 +14,62 @@ workflow xenoClassify {
 input {
   Array[InputGroup] inputs
   String reference
+  String hostReference = "mm10"
   String libraryDesign
   String outputFileNamePrefix = ""
+  Boolean filterSupAlignments = true
 }
 
 String outputPrefix = outputFileNamePrefix
-# We support only single-lane data for WG
-File fastqR1 = select_first(inputs).fastqR1
-File fastqR2 = select_first(inputs).fastqR2
-String rG = select_first(inputs).readGroup
-
+# We fully support only single-lane data for WG. Workflow won't fail with multiple lanes but will return merged bam and bai 
+# + merged report
 if (libraryDesign == "WG" || libraryDesign == "EX" || libraryDesign == "TS") {
-
+ scatter(inp in inputs) {
  call bwaMem.bwamem2 as generateHostBamWG {
    input:
-     fastqR1 = fastqR1, 
-     fastqR2 = fastqR2, 
-     runBwamem2_readGroups = rG,
-     reference = "mm10",
+     fastqR1 = inp.fastqR1, 
+     fastqR2 = inp.fastqR2, 
+     runBwamem2_readGroups = inp.readGroup,
+     reference = hostReference,
      outputFileNamePrefix = "host"
  }
 
  call bwaMem.bwamem2 as generateGraftBamWG {
    input:
-     fastqR1 = fastqR1,
-     fastqR2 = fastqR2,
-     runBwamem2_readGroups = rG,
+     fastqR1 = inp.fastqR1,
+     fastqR2 = inp.fastqR2,
+     runBwamem2_readGroups = inp.readGroup,
      reference = reference,
      outputFileNamePrefix = "graft"
  }
- call sortBam as sortHostBamWG { input: inBam = select_first([generateHostBamWG.bwamem2Bam, generateHostBamWT.starBam]) }
- call sortBam as sortGraftBamWG { input: inBam = select_first([generateGraftBamWG.bwamem2Bam, generateGraftBamWT.starBam]) }
+ call sortBam as sortHostBamWG { input: inBam = generateHostBamWG.bwamem2Bam }
+ call sortBam as sortGraftBamWG { input: inBam = generateGraftBamWG.bwamem2Bam }
  call classify as classifyWG { input: hostBam = sortHostBamWG.sortedBam, graftBam = sortGraftBamWG.sortedBam, outputPrefix = outputFileNamePrefix }
- call filterHost as filterHostWG { input: xenoClassifyBam = classifyWG.xenoClassifyBam, outputPrefix = outputFileNamePrefix }
- call mergeReports as mergeReportsWG { input: inputReports = [classifyWG.jsonReport], inputRgs = [rG], outputPrefix = outputFileNamePrefix }
-} 
+ call filterHost as filterHostWG { input: xenoClassifyBam = classifyWG.xenoClassifyBam, rG = inp.readGroup, outputPrefix = outputFileNamePrefix }
+ }
+ call mergeBams { input: inputBams = filterHostWG.outputBam, outputPrefix = outputFileNamePrefix }
+ call mergeReports as mergeReportsWG { input: inputReports = classifyWG.jsonReport, inputRgs = filterHostWG.readGroup, outputPrefix = outputFileNamePrefix }
+}
 
 if (libraryDesign == "WT" || libraryDesign == "MR") {
   scatter(inp in inputs) {
     call star.star as generateHostBamWT {
       input:
         inputGroups = [inp],
-        reference = "mm10",
+        reference = hostReference,
         outputFileNamePrefix = "host"
     }
-    call sortBam as sortHostBamWT { input: inBam = generateHostBamWT.starBam }
+    call sortBam as sortHostBamWT { input: inBam = generateHostBamWT.starBam, filterSupAlignments = filterSupAlignments }
     call star.star as generateGraftBamWT {
       input:
         inputGroups = [inp],
         reference = reference,
         outputFileNamePrefix = "graft"
     }
-    call sortBam as sortGraftBamWT { input: inBam = generateGraftBamWT.starBam }
+    call sortBam as sortGraftBamWT { input: inBam = generateGraftBamWT.starBam, filterSupAlignments = filterSupAlignments }
     
     call classify as classifyWT { input: hostBam = sortHostBamWT.sortedBam, graftBam = sortGraftBamWT.sortedBam, outputPrefix = outputFileNamePrefix }
-    call filterHost as filterHostWT { input: xenoClassifyBam = classifyWT.xenoClassifyBam, outputPrefix = outputFileNamePrefix }
+    call filterHost as filterHostWT { input: xenoClassifyBam = classifyWT.xenoClassifyBam, rG = inp.readGroup, outputPrefix = outputFileNamePrefix }
     call makeFastq { input: inputBam = filterHostWT.outputBam, rG = inp.readGroup, outputPrefix = outputFileNamePrefix }
   }
   # Also, re-align filtered data with star and merge reports from the classify task
@@ -82,8 +83,8 @@ if (libraryDesign == "WT" || libraryDesign == "MR") {
 }
 
 output {
-  File filteredResults = select_first([generateFinalBamWT.starBam, filterHostWG.outputBam]) 
-  File filteredResultsIndex = select_first([generateFinalBamWT.starIndex, filterHostWG.outputBai])
+  File filteredResults = select_first([generateFinalBamWT.starBam, mergeBams.outputBam])
+  File filteredResultsIndex = select_first([generateFinalBamWT.starIndex, mergeBams.outputIndex])
   File? starChimeric = generateFinalBamWT.starChimeric
   File? transcriptomeBam = generateFinalBamWT.transcriptomeBam
   File? geneReadFile = generateFinalBamWT.geneReadFile
@@ -94,6 +95,8 @@ parameter_meta {
   inputs: "Array of fastq files for read 1 and 2 along with rG string"
   libraryDesign: "Supported library design acronym. We support WG, EX, TS, WT and MR. Default is WG"
   reference: "The reference of Graft to align the data with by either STAR or BWA"
+  hostReference: "The reference for host, most of the time it is mouse mm10"
+  filterSupAlignments: "Remove supplemental alignments from WT data (default true)"
   outputFileNamePrefix: "Output file name prefix"
 }
 
@@ -101,19 +104,11 @@ parameter_meta {
 meta {
   author: "Peter Ruzanov"
   email: "peter.ruzanov@oicr.on.ca"
-  description: "Xenoclassify 1.3: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).\n\n ![Xenoclassify, how it works](docs/xenoclassify_wf.png)\n"
+  description: "Xenoclassify 1.5: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).\n\n ![Xenoclassify, how it works](docs/xenoclassify_wf.png)\n"
   dependencies: [
     {
-      name: "bwa/0.7.12",
-      url: "https://github.com/lh3/bwa/archive/0.7.12.tar.gz"
-    },
-    {
-      name: "star/2.7.6a",
-      url: "https://github.com/alexdobin/STAR/archive/2.7.6a.tar.gz"
-    }, 
-    {
-      name: "samtools/1.9",
-      url: "https://github.com/samtools/samtools/archive/1.9.tar.gz"
+      name: "samtools/1.14",
+      url: "https://github.com/samtools/samtools/archive/1.14.tar.gz"
     },
     {
       name: "xenoclassify/1.0",
@@ -142,12 +137,17 @@ input {
 	File inBam
 	Int jobMemory  = 10
         String? tmpDir
-        String modules = "samtools/1.9"
+        String modules = "samtools/1.14"
+        Boolean filterSupAlignments = false
         Int timeout = 72
 }
 
 command <<<
- samtools sort -n ~{inBam} ~{'-T ' + tmpDir} -o ~{basename(inBam, '.bam')}_sorted.bam
+    if [[ "~{filterSupAlignments}" == "true" ]]; then
+        samtools sort -n ~{inBam} ~{'-T ' + tmpDir} | samtools view -F 2048 - -bh > ~{basename(inBam, '.bam')}_sorted.bam
+    else
+        samtools sort -n ~{inBam} ~{'-T ' + tmpDir} -o ~{basename(inBam, '.bam')}_sorted.bam
+    fi
 >>>
 
 parameter_meta {
@@ -155,6 +155,7 @@ parameter_meta {
  tmpDir: "Optionally supply tmpDir for writing chunk bam files for sorting"
  jobMemory: "Memory allocated to sort task"
  modules: "Names and versions of modules needed for sorting"
+ filterSupAlignments: "Optional flag for removing supplemental (chimeric) alignments to prevent failures with WT data"
  timeout: "Timeout for this task in hours"
 }
 
@@ -177,7 +178,7 @@ input {
         File hostBam
         File graftBam
         String outputPrefix
-	String modules = "samtools/1.9 xenoclassify/1.0"
+	String modules = "samtools/1.14 xenoclassify/1.0"
 	Int jobMemory = 10
         Int neitherThreshold = 20
         Int tolerance = 5
@@ -243,8 +244,9 @@ task filterHost {
 input {
         File xenoClassifyBam
         String outputPrefix = "OUTPUT"
-        String modules = "samtools/1.9"
+        String modules = "samtools/1.14"
         String? tmpDir
+        String rG
         Array[String] filterTags = ["host"]
         Int jobMemory = 5
         Int timeout = 72
@@ -256,6 +258,7 @@ parameter_meta {
  outputPrefix: "Prefix for making filtered bam name"
  modules: "Names and versions of modules needed for filtering"
  filterTags: "Filter reads with these tags"
+ rG: "Read group string for passing to the downstream process"
  jobMemory: "Memory allocated to filtering task"
  timeout: "Timeout for this task in hours"
 }
@@ -286,6 +289,7 @@ runtime {
 output {
   File outputBam = "${outputPrefix}_filtered.bam"
   File outputBai = "${outputPrefix}_filtered.bai"
+  String readGroup = "~{rG}"
 }
 
 }
@@ -302,7 +306,7 @@ input {
   String outputPrefix
   String rG
   String picardParams = "VALIDATION_STRINGENCY=LENIENT"
-  String modules = "samtools/1.9 picard/2.21.2"
+  String modules = "samtools/1.14 picard/2.21.2"
 }
 
 Int javaMemory = jobMemory - overhead
@@ -334,7 +338,7 @@ runtime {
 }
 
 output {
-  InputGroup fastqData = {"fastqR1": "~{outputPrefix}_part_1.fastq.gz", "fastqR2": "~{outputPrefix}_part_2.fastq.gz", "ReadGroup": "~{rG}"}
+  InputGroup fastqData = {"fastqR1":"~{outputPrefix}_part_1.fastq.gz", "fastqR2":"~{outputPrefix}_part_2.fastq.gz", "readGroup":"~{rG}"}
   String readGroup = "~{rG}"
 }
 }
@@ -403,4 +407,40 @@ task mergeReports {
   }
 }
 
+# =========================================
+#   WG: Merge filtered bam files
+# =========================================
+task mergeBams {
+  input {
+    Array[File] inputBams
+    String outputPrefix
+    String modules = "samtools/1.14"
+    Int jobMemory = 8
+    Int timeout = 8
+  }
 
+  parameter_meta {
+    inputBams: "Array of input BAM files"
+    outputPrefix: "Output prefix for the result file"
+    jobMemory: "Memory for the task, in gigabytes"
+    modules: "Environment modules for the task"
+    timeout: "Timeout for the task, in hours"
+  }
+
+ command <<<
+  set -euo pipefail
+  samtools merge -o ~{outputPrefix}_filtered.bam ~{sep=" " inputBams}
+  samtools index ~{outputPrefix}_filtered.bam ~{outputPrefix}_filtered.bai
+ >>>
+
+  runtime {
+    memory:  "~{jobMemory} GB"
+    modules: "~{modules}"
+    timeout: "~{timeout}"
+  }
+
+  output {
+    File outputBam = "~{outputPrefix}_filtered.bam"
+    File outputIndex = "~{outputPrefix}_filtered.bai"
+  }
+}

@@ -102,15 +102,15 @@ workflow bwamem2 {
     }
 
     Map[String,String] bwamem2_modules_by_genome = { 
-    "hg19": "samtools/1.9 bwa-mem2/2.2.1 hg19-bwamem2-index/2.2.1",
-    "hg38": "samtools/1.9 bwa-mem2/2.2.1 hg38-bwamem2-index-with-alt/2.2.1",
-    "mm10": "samtools/1.9 bwa-mem2/2.2.1 mm10-bwamem2-index/2.2.1"
+      "hg19": "samtools/1.9 bwa-mem2/2.2.1 hg19-bwamem2-index/2.2.1",
+      "hg38": "samtools/1.9 bwa-mem2/2.2.1 hg38-bwamem2-index-with-alt/2.2.1",
+      "mm10": "samtools/1.9 bwa-mem2/2.2.1 mm10-bwamem2-index/2.2.1"
     }
 
     Map[String,String] bwamem2Ref_by_genome = { 
-    "hg19": "$HG19_BWAMEM2_INDEX_ROOT/hg19_index",
-    "hg38": "$HG38_BWAMEM2_INDEX_WITH_ALT_ROOT/hg38_random.fa",
-    "mm10": "$MM10_BWAMEM2_INDEX_ROOT/mm10_index"
+      "hg19": "$HG19_BWAMEM2_INDEX_ROOT/hg19_index",
+      "hg38": "$HG38_BWAMEM2_INDEX_WITH_ALT_ROOT/hg38_random.fa",
+      "mm10": "$MM10_BWAMEM2_INDEX_ROOT/mm10_index"
     }
 
 
