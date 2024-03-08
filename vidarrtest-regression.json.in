@@ -111,6 +111,8 @@
             "xenoClassify.generateGraftBamWG.trimMinQuality": null,
             "xenoClassify.generateHostBamWG.adapter1": null,
             "xenoClassify.generateHostBamWG.adapter2": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_adapter1": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_adapter2": null,
             "xenoClassify.generateHostBamWG.adapterTrimming_doUMItrim": null,
             "xenoClassify.generateHostBamWG.adapterTrimming_trimMinLength": null,
             "xenoClassify.generateHostBamWG.adapterTrimming_trimMinQuality": null,
@@ -456,6 +458,8 @@
             "xenoClassify.generateGraftBamWG.trimMinQuality": null,
             "xenoClassify.generateHostBamWG.adapter1": null,
             "xenoClassify.generateHostBamWG.adapter2": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_adapter1": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_adapter2": null,
             "xenoClassify.generateHostBamWG.adapterTrimmingLog_jobMemory": null,
             "xenoClassify.generateHostBamWG.adapterTrimmingLog_timeout": null,
             "xenoClassify.generateHostBamWG.adapterTrimming_addParam": null,
@@ -708,7 +712,7 @@
             "xenoClassify.classifyWT.neitherThreshold": null,
             "xenoClassify.classifyWT.timeout": null,
             "xenoClassify.classifyWT.tolerance": null,
-            "xenoClassify.inputFastqs": [{
+            "xenoClassify.inputs": [{
                  "fastqR1":  {
                         "contents": {
                             "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT_R1_subs.fastq.gz",
@@ -829,6 +833,8 @@
             "xenoClassify.generateGraftBamWG.trimMinQuality": null,
             "xenoClassify.generateHostBamWG.adapter1": null,
             "xenoClassify.generateHostBamWG.adapter2": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_adapter1": null,
+            "xenoClassify.generateHostBamWG.adapterTrimming_adapter2": null,
             "xenoClassify.generateHostBamWG.adapterTrimming_doUMItrim": null,
             "xenoClassify.generateHostBamWG.adapterTrimming_trimMinLength": null,
             "xenoClassify.generateHostBamWG.adapterTrimming_trimMinQuality": null,
