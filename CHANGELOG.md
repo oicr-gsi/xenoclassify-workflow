@@ -1,5 +1,7 @@
 ## 1.5.0 - 2022-03-08
  - updated imported bwaMem (to bwamem2 2.2.1) and star (to 2.3.0)
+ - updated samtools from 1.9 to 1.14
+ - flag for removing supplemental alignments (ON by default to prevent failures when using updated STAR)
 ## 1.4.0 - 2022-06-15
  - assembly-specific modules are specified inside the workflow
 ## 1.3.0 - 2022-03-08
