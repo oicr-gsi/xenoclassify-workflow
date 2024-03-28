@@ -6,14 +6,17 @@ This section lists command(s) run by Xenoclassify workflow
 Xenoclassify aligns data to host and graft genomes using imported bwaMem (or star) workflow and then classify reads depending on their alignment scores.
 In the case of STAR we support multi-lane data. WG/EX/TS data are going to be aligned as single-lane data only.
 
-Sort bam files by read name
+### Sort bam files by read name, optionally remove supplemental (chimeric) alignments
 
 ```
- samtools sort -n INPUT_BAM -T TMP_DIR -o BAM_BASENAME_sorted.bam
-
+    if [[ "~{filterSupAlignments}" == "true" ]]; then
+        samtools sort -n ~{inBam} ~{'-T ' + tmpDir} | samtools view -F 2048 - -bh > ~{basename(inBam, '.bam')}_sorted.bam
+    else
+        samtools sort -n ~{inBam} ~{'-T ' + tmpDir} -o ~{basename(inBam, '.bam')}_sorted.bam
+    fi
 ```
 
-Classify reads with xenoclassify.py script:
+### Classify reads with xenoclassify.py script:
 
 ```
  
@@ -41,7 +44,7 @@ Classify reads with xenoclassify.py script:
  
 ```
 
-Filter reads matching the supplied classification(s) and provision filtered .bam along with its index
+### Filter reads matching the supplied classification(s) and provision filtered .bam along with its index
 
 ```
  
@@ -64,7 +67,7 @@ Filter reads matching the supplied classification(s) and provision filtered .bam
 
 ```
 
-Extract reads from filtered file into fastq format with picard:
+### Extract reads from filtered file into fastq format with picard:
 
 ```
  set -euo pipefail
@@ -75,7 +78,7 @@ Extract reads from filtered file into fastq format with picard:
 
 ```
 
-In addition, we run second pass STAR alignments with reads from the filtered bam extracted into fastq
+### In addition, we run second pass STAR alignments with reads from the filtered bam extracted into fastq
 
 
 Merging reports - this is needed only for multi-lane transcriptome data processing
@@ -113,9 +116,15 @@ For multi-lane data we also add lane identificators
 
 ```
 
-Examples of json report for single-lane and multi-lane data:
+### Merging and indexing bam files
 
 ```
+  set -euo pipefail
+  samtools merge -o ~{outputPrefix}_filtered.bam ~{sep=" " inputBams}
+  samtools index ~{outputPrefix}_filtered.bam ~{outputPrefix}_filtered.bai
+```
+
+### Examples of json report for single-lane and multi-lane data:
 
 single-lane:
 
@@ -141,4 +150,3 @@ multi-lane:
   }
 }
 
-```
