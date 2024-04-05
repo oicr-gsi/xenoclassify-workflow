@@ -138,7 +138,7 @@ input {
 	Int jobMemory  = 10
         String? tmpDir
         String modules = "samtools/1.14"
-        Boolean filterSupAlignments
+        Boolean filterSupAlignments = true
         Int timeout = 72
 }
 
