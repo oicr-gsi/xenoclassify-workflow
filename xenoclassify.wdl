@@ -138,16 +138,12 @@ input {
 	Int jobMemory  = 10
         String? tmpDir
         String modules = "samtools/1.14"
-        Boolean filterSupAlignments = false
+        Boolean filterSupAlignments = true
         Int timeout = 72
 }
 
 command <<<
-    if [[ "~{filterSupAlignments}" == "true" ]]; then
-        samtools sort -n ~{inBam} ~{'-T ' + tmpDir} | samtools view -F 2048 - -bh > ~{basename(inBam, '.bam')}_sorted.bam
-    else
-        samtools sort -n ~{inBam} ~{'-T ' + tmpDir} -o ~{basename(inBam, '.bam')}_sorted.bam
-    fi
+  samtools sort -n ~{inBam} ~{'-T ' + tmpDir} ~{if (filterSupAlignments) then " | samtools view -F 2048 - -bh > " else "-o "} ~{basename(inBam, '.bam')}_sorted.bam
 >>>
 
 parameter_meta {

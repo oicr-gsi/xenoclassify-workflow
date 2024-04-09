@@ -1,4 +1,8 @@
-## 1.5.0 - 2022-03-08
+## 1.5.1 - 2024-04-08
+ - Changed default filterSupplemental to tru for sorting task
+ - Changed how the above task handled flag (it appears that previous version 
+   did not have the right implementation for filterSupplemental flag check)
+## 1.5.0 - 2024-03-08
  - updated imported bwaMem (to bwamem2 2.2.1) and star (to 2.3.0)
  - updated samtools from 1.9 to 1.14
  - flag for removing supplemental alignments (ON by default to prevent failures when using updated STAR)
