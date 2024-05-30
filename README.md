@@ -1,9 +1,8 @@
 # xenoClassify
 
-Xenoclassify 1.5: This Seqware workflow classifies short-read sequencing data generated from xenograft samples using [XenoClassify](https://github.com/oicr-gsi/xenoclassify).
+Xenoclassify workflow classifies short-read sequencing data generated from xenograft samples. It requires alignment to the reference genomes of the graft and host species using bwamem2 or STAR. Once aligned, reads (or read pairs) are assessed to identify the likely source of the cells from which the DNA/RNA was extracted. The output is a bam file with reads tagged to indicate the source species. Also, the workflow creates a report in JSON format. The workflow uses [XenoClassify](https://github.com/oicr-gsi/xenoclassify).
 
- ![Xenoclassify, how it works](docs/xenoclassify_wf.png)
-
+[Xenoclassify, how it works](docs/xenoclassify_wf.png)
 
 ## Overview
 
