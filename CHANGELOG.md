@@ -1,3 +1,5 @@
+## 1.6.0 - 2024-06-25
+ - [GRD-797](https://jira.oicr.on.ca/browse/GRD-797) - add vidarr labels to outputs (changes to medata only)
 ## 1.5.1 - 2024-04-08
  - Changed default filterSupplemental to tru for sorting task
  - Changed how the above task handled flag (it appears that previous version 

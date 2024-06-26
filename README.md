@@ -129,12 +129,12 @@ Parameter|Value|Default|Description
 `sortHostBamWG.jobMemory`|Int|10|Memory allocated to sort task
 `sortHostBamWG.tmpDir`|String?|None|Optionally supply tmpDir for writing chunk bam files for sorting
 `sortHostBamWG.modules`|String|"samtools/1.14"|Names and versions of modules needed for sorting
-`sortHostBamWG.filterSupAlignments`|Boolean|false|Optional flag for removing supplemental (chimeric) alignments to prevent failures with WT data
+`sortHostBamWG.filterSupAlignments`|Boolean|true|Optional flag for removing supplemental (chimeric) alignments to prevent failures with WT data
 `sortHostBamWG.timeout`|Int|72|Timeout for this task in hours
 `sortGraftBamWG.jobMemory`|Int|10|Memory allocated to sort task
 `sortGraftBamWG.tmpDir`|String?|None|Optionally supply tmpDir for writing chunk bam files for sorting
 `sortGraftBamWG.modules`|String|"samtools/1.14"|Names and versions of modules needed for sorting
-`sortGraftBamWG.filterSupAlignments`|Boolean|false|Optional flag for removing supplemental (chimeric) alignments to prevent failures with WT data
+`sortGraftBamWG.filterSupAlignments`|Boolean|true|Optional flag for removing supplemental (chimeric) alignments to prevent failures with WT data
 `sortGraftBamWG.timeout`|Int|72|Timeout for this task in hours
 `classifyWG.modules`|String|"samtools/1.14 xenoclassify/1.0"|Names and versions of modules needed for classification
 `classifyWG.jobMemory`|Int|10|Memory allocated to classify task
@@ -274,14 +274,14 @@ Parameter|Value|Default|Description
 
 ### Outputs
 
-Output | Type | Description
----|---|---
-`filteredResults`|File|bam file without host (most commonly mouse) reads
-`filteredResultsIndex`|File|index file for file without host reads
-`starChimeric`|File?|Chimeric Graft junctions, provisioned for WT data only
-`transcriptomeBam`|File?|transcriptomeBam is a file produced for Graft WT data only
-`geneReadFile`|File?|.tab file with Graft gene read outs, only for WT data
-`jsonReport`|File|a simple stats file with counts for differently tagged reads
+Output | Type | Description | Labels
+---|---|---|---
+`filteredResults`|File|bam file without host (most commonly mouse) reads|vidarr_label: filteredResults
+`filteredResultsIndex`|File|index file for file without host reads|vidarr_label: filteredResultsIndex
+`starChimeric`|File?|Chimeric Graft junctions, provisioned for WT data only|vidarr_label: starChimeric
+`transcriptomeBam`|File?|transcriptomeBam is a file produced for Graft WT data only|vidarr_label: transcriptomeBam
+`geneReadFile`|File?|.tab file with Graft gene read outs, only for WT data|vidarr_label: geneReadFile
+`jsonReport`|File|a simple stats file with counts for differently tagged reads|vidarr_label: jsonReport
 
 
 ## Commands

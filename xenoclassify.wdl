@@ -115,14 +115,32 @@ meta {
       url: "https://github.com/oicr-gsi/xenoclassify/archive/1.1.tar.gz"
     }
   ]
-  output_meta: {
-    filteredResults: "bam file without host (most commonly mouse) reads",
-    filteredResultsIndex: "index file for file without host reads",
-    starChimeric: "Chimeric Graft junctions, provisioned for WT data only",
-    transcriptomeBam: "transcriptomeBam is a file produced for Graft WT data only",
-    geneReadFile: ".tab file with Graft gene read outs, only for WT data",
-    jsonReport: "a simple stats file with counts for differently tagged reads" 
-  }
+    output_meta: {
+    filteredResults: {
+        description: "bam file without host (most commonly mouse) reads",
+        vidarr_label: "filteredResults"
+    },
+    filteredResultsIndex: {
+        description: "index file for file without host reads",
+        vidarr_label: "filteredResultsIndex"
+    },
+    starChimeric: {
+        description: "Chimeric Graft junctions, provisioned for WT data only",
+        vidarr_label: "starChimeric"
+    },
+    transcriptomeBam: {
+        description: "transcriptomeBam is a file produced for Graft WT data only",
+        vidarr_label: "transcriptomeBam"
+    },
+    geneReadFile: {
+        description: ".tab file with Graft gene read outs, only for WT data",
+        vidarr_label: "geneReadFile"
+    },
+    jsonReport: {
+        description: "a simple stats file with counts for differently tagged reads",
+        vidarr_label: "jsonReport"
+    }
+}
 }
 
 }
