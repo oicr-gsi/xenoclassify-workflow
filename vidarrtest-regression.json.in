@@ -21,7 +21,7 @@
                 {
                     "fastqR1": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R1_001.fastq.subset.fastq.gz",
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/test_inputs/Test01_R1.fastq.subset.fastq.gz",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -33,7 +33,7 @@
                     },
                     "fastqR2": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/SWID_631708_PCSI_0044_Pa_P_PE_701_WG_131010_h239_0211_AC2RJDACXX_NoIndex_L002_R2_001.fastq.subset.fastq.gz",
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/test_inputs/Test01_R2.fastq.subset.fastq.gz",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -286,12 +286,12 @@
            "write_to_cache": false,
            "read_from_cache": false
         },
-        "id": "PCSI_0044_DOWNSAMPLED_ONLYGRAFT",
+        "id": "PCSI_DOWNSAMPLED_ONLYGRAFT",
         "metadata": {
             "xenoClassify.filteredResults": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -299,7 +299,7 @@
             "xenoClassify.filteredResultsIndex": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -307,7 +307,7 @@
             "xenoClassify.jsonReport": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -315,7 +315,7 @@
             "xenoClassify.starChimeric": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -323,7 +323,7 @@
             "xenoClassify.transcriptomeBam": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -331,7 +331,7 @@
             "xenoClassify.geneReadFile": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -341,7 +341,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/1.5/PCSI_0044_DOWNSAMPLED_ONLYGRAFT.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/workflow_test_01.metrics",
                 "type": "script"
             }
         ]
@@ -367,7 +367,7 @@
             "xenoClassify.inputs": [{
                     "fastqR1":  {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/k562_NoIndex_L001_R1_001.fastq.gz",
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/test_inputs/Test02_R1.fastq.gz",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -379,7 +379,7 @@
                      },
                      "fastqR2": {
                          "contents": {
-                             "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/k562_NoIndex_L001_R2_001.fastq.gz",
+                             "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/test_inputs/Test02_R2.fastq.gz",
                              "externalIds": [
                                  {
                                      "id": "TEST",
@@ -663,7 +663,7 @@
             "xenoClassify.starChimeric": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -671,7 +671,7 @@
             "xenoClassify.transcriptomeBam": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -679,7 +679,7 @@
             "xenoClassify.geneReadFile": {
                 "contents": [
                     {
-                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_0044_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
+                        "outputDirectory": "@SCRATCH@/@DATE@_Workflow_xenoclassify-workflow_PCSI_DOWNSAMPLED_ONLYGRAFT_@JENKINSID@"
                     }
                 ],
                 "type": "ALL"
@@ -689,7 +689,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/1.5/K562_DOWNSAMPLED_ONLYGRAFT.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/workflow_test_02.metrics",
                 "type": "script"
             }
         ]
@@ -715,7 +715,7 @@
             "xenoClassify.inputs": [{
                  "fastqR1":  {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT_R1_subs.fastq.gz",
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/test_inputs/Test03_R1_subs.fastq.gz",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -727,7 +727,7 @@
                      },
                  "fastqR2": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT_R2_subs.fastq.gz",
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/test_inputs/Test03_R2_subs.fastq.gz",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -737,12 +737,12 @@
                        },
                        "type": "EXTERNAL"
                 },
-               "readGroup": "ID:210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT PL:ILLUMINA PU:210430_A00469_0173_AH7NV2DRXY_2_CTGTTGAC-ACCTCAGT LB:PTXNASH_0005_Lv_O_PE_349_WT SM:PTXNASH_0005_Lv_O_NAFLD-1 CM:OICR"
+               "readGroup": "ID:Test03 PL:ILLUMINA PU:Test03 LB:PTXNASH_Test03_WT SM:PTXNASH_Test03 CM:OICR"
             },
             {
                  "fastqR1": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT_R1_subs.fastq.gz", 
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/test_inputs/Test04_R1_subs.fastq.gz", 
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -754,7 +754,7 @@
                      },
                  "fastqR2": {
                         "contents": {
-                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/input_data/PTXNASH_0005_Lv_O_PE_349_WT_210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT_R2_subs.fastq.gz",
+                            "configuration": "/.mounts/labs/gsi/testdata/xenoClassify/test_inputs/Test04_R2_subs.fastq.gz",
                             "externalIds": [
                                 {
                                     "id": "TEST",
@@ -764,7 +764,7 @@
                         },
                         "type": "EXTERNAL"
                  },
-                 "readGroup": "ID:210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT PL:ILLUMINA PU:210601_A00469_0179_BHCKFVDRXY_1_CTGTTGAC-ACCTCAGT LB:PTXNASH_0005_Lv_O_PE_349_WT SM:PTXNASH_0005_Lv_O_NAFLD-1 CM:OICR"
+                 "readGroup": "ID:Test04 PL:ILLUMINA PU:Test04 LB:PTXNASH_Test04_WT SM:PTXNASH_Test04 CM:OICR"
              }
             ],
             "xenoClassify.filterHostWG.filterTags": [
@@ -1064,7 +1064,7 @@
             {
                 "metrics_calculate": "@CHECKOUT@/tests/calculate.sh",
                 "metrics_compare": "@CHECKOUT@/tests/compare.sh",
-                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/1.5/PTXNASH_DOWNSAMPLED_ONLYGRAFT.metrics",
+                "output_metrics": "/.mounts/labs/gsi/testdata/xenoClassify/output_metrics/workflow_test_03.metrics",
                 "type": "script"
             }
         ]
