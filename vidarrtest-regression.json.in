@@ -737,7 +737,7 @@
                        },
                        "type": "EXTERNAL"
                 },
-               "readGroup": "ID:Test03 PL:ILLUMINA PU:Test03 LB:PTXNASH_Test03_WT SM:PTXNASH_Test03 CM:OICR"
+               "readGroup": "ID:Test03 PL:ILLUMINA PU:Test03 LB:PTXNASH_Test03_WT SM:PTXNASH_Test03 CN:OICR"
             },
             {
                  "fastqR1": {
@@ -764,7 +764,7 @@
                         },
                         "type": "EXTERNAL"
                  },
-                 "readGroup": "ID:Test04 PL:ILLUMINA PU:Test04 LB:PTXNASH_Test04_WT SM:PTXNASH_Test04 CM:OICR"
+                 "readGroup": "ID:Test04 PL:ILLUMINA PU:Test04 LB:PTXNASH_Test04_WT SM:PTXNASH_Test04 CN:OICR"
              }
             ],
             "xenoClassify.filterHostWG.filterTags": [
