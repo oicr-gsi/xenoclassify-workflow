@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.2] - 2026-11-09
+### Changed
+- [GP-5989](https://jira.oicr.on.ca/browse/GP-5989) - normalize json before calculating md5sums to make things consistent across Univa and SLURM.
+- This update only affects how RT results are processed and does not change the outcome of the analysis.
+
 ## [1.6.1] - 2025-05-26
 - Re-deployment to enable labels for optional outputs
 - [GRD-948](https://jira.oicr.on.ca/browse/GRD-948)

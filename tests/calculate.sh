@@ -4,9 +4,9 @@ set -o errexit
 set -o pipefail
 
 # For bam file we do the md5sum
-module load samtools/1.14
+module load samtools/1.14 jq/1.6
 # For json file we do the md5sum
-find . -name '*.json' | xargs md5sum
+for f in $(find . -name '*.json');do cat $f | jq -S | md5sum;done
 JUNCTIONS="./Xenoclassify.Chimeric.out.junction"
 # Optional files from STAR
 if [[ -f $JUNCTIONS ]];then
